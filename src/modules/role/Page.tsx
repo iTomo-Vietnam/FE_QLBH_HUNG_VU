@@ -4,8 +4,10 @@ import { Card } from "antd";
 import { RoleList, RolePermission } from "./partials";
 import { useRoleStore } from "./role.store";
 import { SortOrder } from "@/shared/constants/enum";
+import { useGlobalData } from "@/shared/hooks";
 
 export const RolePage: React.FC = () => {
+  const { currentStore } = useGlobalData();
   const [selectedRow, setSelectedRow] = useState<Role | null>(null);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
@@ -14,6 +16,7 @@ export const RolePage: React.FC = () => {
     sortBy: "name",
     page: 1,
     size: 999,
+    storeId: currentStore?.id,
   });
 
   useEffect(() => {

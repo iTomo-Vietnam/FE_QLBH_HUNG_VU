@@ -26,7 +26,7 @@ export const DebtAdjustmentDetailModal: React.FC<DetailModalProps<DebtAdjustment
         <Descriptions.Item label="Thời gian">{formatDateTimeDDMMYYYY(data.occurredAt)}</Descriptions.Item>
         <Descriptions.Item label="Loại công nợ">{debtSideMap[data.side]}</Descriptions.Item>
         <Descriptions.Item label="Đối tác">
-          {data.partner?.name || data.partnerSnapshot?.name || "Toàn hệ thống"}
+          {data.partner?.name || data.partnerSnapshot?.name || "Không xác định"}
         </Descriptions.Item>
         <Descriptions.Item label="Số dư hệ thống">{formatMoney(data.expectedAmount)}</Descriptions.Item>
         <Descriptions.Item label="Số dư thực tế">{formatMoney(data.countedAmount)}</Descriptions.Item>

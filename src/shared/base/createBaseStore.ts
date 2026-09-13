@@ -66,6 +66,8 @@ export function createBaseStore<
   key: string;
   apiUrl: string;
   permissionModule?: Module | string;
+  /** Normal screens are scoped to the active store; dashboards/reports can opt out. */
+  storeScope?: "current" | "available" | "none";
   messages?: EntityMessage;
 
   extend?: (ctx: {
@@ -85,7 +87,17 @@ export function createBaseStore<
     onSuccess?: () => void,
   ): BaseStoreReturn<T> & TExtra {
     const queryClient = useQueryClient();
-    const { permissions } = useGlobalData();
+    const { permissions, currentStore } = useGlobalData();
+    const effectiveParams =
+      config.storeScope === "none"
+        ? params
+        : config.storeScope === "available"
+          ? params
+          : {
+              ...params,
+              storeIds:
+                (params as any)?.storeIds ?? (currentStore?.id ? [currentStore.id] : []),
+            };
 
     const can = config.permissionModule
       ? (permission: Permission) =>
@@ -100,13 +112,13 @@ export function createBaseStore<
     const { notify, errors, onError } = useErrorState();
 
     const query = useQuery<ApiResponse<T[]>, BaseFailurePayload>({
-      queryKey: [config.key, params],
+      queryKey: [config.key, effectiveParams],
       placeholderData: keepPreviousData,
       queryFn: async () => {
-        let finalParams = formatPayload(params);
+        let finalParams = formatPayload(effectiveParams);
         return await getData<T[]>(config.apiUrl, finalParams);
       },
-      enabled: can("read") && (!params || !params.isLocked),
+      enabled: can("read") && (!effectiveParams || !effectiveParams.isLocked),
     });
 
     // ===== CREATE =====

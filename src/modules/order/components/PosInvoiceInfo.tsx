@@ -135,7 +135,7 @@ export const PosInvoiceInfo: React.FC<Props> = ({
   const paymentDifference = paidAmount - paymentDue;
 
   return (
-    <aside className="flex w-[520px] shrink-0 flex-col overflow-y-auto border-l border-gray-200 bg-white">
+    <aside className="flex w-[clamp(420px,32vw,520px)] shrink-0 flex-col overflow-y-auto border-l border-gray-200 bg-white">
       <section className="border-b border-gray-200 px-4 py-2">
         <div className="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">
           Khách hàng
@@ -237,6 +237,16 @@ export const PosInvoiceInfo: React.FC<Props> = ({
 
       <section className={`p-4`}>
         <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Thanh toán</h3>
+        <Segmented
+          block
+          className="mb-3"
+          value={paymentMode}
+          options={[
+            { label: "Tiền mặt", value: FundType.CASH },
+            { label: "Chuyển khoản", value: FundType.BANK },
+          ]}
+          onChange={(value) => changePaymentMode(value as FundType)}
+        />
         <div className="flex items-center justify-between gap-3 py-2 text-sm">
           <span>{type === OrderType.SALE_RETURN ? "Tiền hoàn khách" : "Khách thanh toán"}</span>
           <div className="w-56">
@@ -253,16 +263,6 @@ export const PosInvoiceInfo: React.FC<Props> = ({
             />
           </div>
         </div>
-        <Segmented
-          block
-          className="mb-3"
-          value={paymentMode}
-          options={[
-            { label: "Tiền mặt", value: FundType.CASH },
-            { label: "Chuyển khoản", value: FundType.BANK },
-          ]}
-          onChange={(value) => changePaymentMode(value as FundType)}
-        />
 
         <div className="hidden">
           <FundListSelect

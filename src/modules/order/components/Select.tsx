@@ -37,10 +37,10 @@ export const OrderSelect: React.FC<SelectProps<Order, OrderQuery>> = ({
 
   const columns: DropdownColumn<Order>[] = [
     { label: "Mã đơn hàng", dataIndex: "code", className: "w-24" },
-    { label: "Ngày", dataIndex: "timeAt", className: "w-20", dataType: "date" },
+    { label: "Ngày", dataIndex: "orderAt", className: "w-20", dataType: "date" },
     {
       label: "Khách hàng",
-      dataIndex: ["customer", "name"],
+      dataIndex: ["partner", "name"],
       className: "w-36",
     },
   ];

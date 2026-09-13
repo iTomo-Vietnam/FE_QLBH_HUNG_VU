@@ -53,7 +53,7 @@ export const DebtAdjustmentTable: React.FC<Props> = ({ onViewDetail, ...rest }) 
         key: "partner",
         width: 160,
         render: (record: DebtAdjustment) =>
-          record.partner?.name || record.partnerSnapshot?.name || "Toàn hệ thống",
+          record.partner?.name || record.partnerSnapshot?.name || "Không xác định",
       },
       {
         title: "Số dư hệ thống",

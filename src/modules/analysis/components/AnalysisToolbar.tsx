@@ -1,5 +1,6 @@
 import React from "react";
-import { StoreSelect } from "@/modules/store/components";
+import { StoreUncontrolledMultipleSelect } from "@/modules/store/components";
+import { Store } from "@/shared/base/entity";
 import { AnalysisPeriod } from "../analysis.model";
 import { AnalysisPeriodPicker } from "./AnalysisPeriodPicker";
 
@@ -7,25 +8,29 @@ export interface AnalysisFilterProps {
   period: AnalysisPeriod;
   onPeriodChange: (value: AnalysisPeriod) => void;
   systemWide: boolean;
-  storeId?: string;
-  onStoreChange?: (value?: string) => void;
+  storeIds?: string[];
+  availableStores?: Store[];
+  onStoresChange?: (value: string[]) => void;
 }
 
 export const AnalysisToolbar: React.FC<AnalysisFilterProps> = ({
   period,
   onPeriodChange,
   systemWide,
-  storeId,
-  onStoreChange,
+  storeIds,
+  availableStores = [],
+  onStoresChange,
 }) => (
   <div className="flex items-center justify-end gap-2">
     <AnalysisPeriodPicker value={period} onChange={onPeriodChange} />
     {systemWide && (
-      <StoreSelect
-        value={storeId}
-        onChange={onStoreChange}
+      <StoreUncontrolledMultipleSelect
+        value={storeIds}
+        options={availableStores}
+        onChange={onStoresChange}
         placeholder="Tất cả chi nhánh"
-        className="min-w-[180px]"
+        className="min-w-[220px]"
+        maxTagCount="responsive"
       />
     )}
   </div>

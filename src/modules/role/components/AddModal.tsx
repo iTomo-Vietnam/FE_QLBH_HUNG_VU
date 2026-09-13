@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { Input, Modal, Form, Radio } from "antd";
+import { Input, Modal, Form } from "antd";
 import { FormProps } from "antd/lib";
 import { Label, SubmitButton } from "@/shared/components";
 import { AddUpdateModalProps } from "@/shared/interfaces";
 import { setFormErrors } from "@/shared/utils";
-import { Role, RoleType } from "../role.model";
+import { Role } from "../role.model";
 import { Icon } from "@iconify/react";
 
 export const AddRoleModal: React.FC<AddUpdateModalProps<Role>> = ({
@@ -56,29 +56,9 @@ export const AddRoleModal: React.FC<AddUpdateModalProps<Role>> = ({
         form={form}
         onFinish={onFinish}
         layout="vertical"
-        initialValues={{ type: RoleType.SYSTEM }}
+        initialValues={{}}
       >
         <div className="flex flex-col">
-          <Form.Item name="type" label={<Label title="Phân loại" required />} className="w-full">
-            <Radio.Group
-              optionType="button"
-              buttonStyle="solid"
-              className="flex w-full mr-auto ml-0 flex-shrink-0"
-            >
-              <Radio.Button
-                value={RoleType.SYSTEM}
-                className={`flex items-center justify-center w-1/2 h-9`}
-              >
-                Hệ thống
-              </Radio.Button>
-              <Radio.Button
-                value={RoleType.STORE}
-                className={`flex items-center justify-center w-1/2 h-9`}
-              >
-                Cửa hàng
-              </Radio.Button>
-            </Radio.Group>
-          </Form.Item>
           <Form.Item
             name="name"
             label={<Label title="Tên vai trò" required />}

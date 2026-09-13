@@ -346,7 +346,6 @@ export const TableColumnConfig: React.FC<TableColumnConfigProps> = ({
           const canComplete = !!onComplete && !!checkCanPermission(record, "complete");
 
           const canExport = !!onExport && !!checkCanPermission(record, "export");
-          const canPrint = !!onPrint && !!checkCanPermission(record, "export");
           const canImport = !!onImport && !!checkCanPermission(record, "import");
 
           const canApprove = !!onApprove && !!checkCanPermission(record, "approve");
@@ -400,7 +399,7 @@ export const TableColumnConfig: React.FC<TableColumnConfigProps> = ({
                     onViewDetail={onViewDetail ? () => onViewDetail(record) : undefined}
                     onExportPdf={onExportPdf ? () => onExportPdf(record) : undefined}
                     onExportExcel={onExportExcel ? () => onExportExcel(record) : undefined}
-                    onPrint={canPrint ? () => onPrint(record) : undefined}
+                    onPrint={onPrint ? () => onPrint(record) : undefined}
                     onPrintBarcode={onPrintBarcode ? () => onPrintBarcode(record) : undefined}
                   />
                 )}
@@ -489,15 +488,10 @@ export const TableColumnConfig: React.FC<TableColumnConfigProps> = ({
           ...(rowSelection.getCheckboxProps?.(record) || {}),
           ...(record?.isSummary ? { disabled: true } : {}),
         }),
-        renderCell: (
-          checked: boolean,
-          record: any,
-          index: number,
-          originNode: React.ReactNode,
-        ) =>
+        renderCell: (checked: boolean, record: any, index: number, originNode: React.ReactNode) =>
           record?.isSummary
             ? null
-            : rowSelection.renderCell?.(checked, record, index, originNode) ?? originNode,
+            : (rowSelection.renderCell?.(checked, record, index, originNode) ?? originNode),
       }
     : undefined;
 

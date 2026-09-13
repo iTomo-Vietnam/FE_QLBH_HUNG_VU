@@ -12,8 +12,13 @@ import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { useState } from "react";
 import { SortOrder } from "@/shared/constants/enum";
 import { Tabs } from "antd";
+import { useGlobalData } from "@/shared/hooks/useGlobalData";
+import { StoreUncontrolledMultipleSelect } from "@/modules/store/components";
 
 export const InventoryPage: React.FC = () => {
+  const { getAvailableStores } = useGlobalData();
+  const availableStores = getAvailableStores("inventoryReport");
+  const [storeIds, setStoreIds] = useState<string[]>([]);
   const navigate = useNavigate();
   const {
     isFilterActive,
@@ -73,6 +78,7 @@ export const InventoryPage: React.FC = () => {
     isLockedTransaction: !rowData,
     productId: rowData?.id,
     refType,
+    ...(storeIds.length ? { storeIds } : {}),
     ...filter,
     ...ranger,
   });
@@ -103,6 +109,14 @@ export const InventoryPage: React.FC = () => {
               startDate={startAt}
               endDate={endAt}
               onRangeChange={pageAction.handleDateRangerChange}
+            />
+            <StoreUncontrolledMultipleSelect
+              value={storeIds}
+              options={availableStores}
+              onChange={setStoreIds}
+              placeholder="Tất cả chi nhánh"
+              className="min-w-[220px]"
+              maxTagCount="responsive"
             />
           </div>
         </div>

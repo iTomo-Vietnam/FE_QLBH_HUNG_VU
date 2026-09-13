@@ -22,7 +22,8 @@ const isAnalysisSection = (value?: string): value is AnalysisSection =>
   analysisTabGroups.some((group) => group.key === value);
 
 export const AnalysisPage: React.FC = () => {
-  const { currentStore } = useGlobalData();
+  const { getAvailableStores } = useGlobalData();
+  const availableStores = getAvailableStores("analysis");
   const { section: sectionParam } = useParams<{ section?: string }>();
   const section: AnalysisSection = isAnalysisSection(sectionParam) ? sectionParam : "sale";
   const currentGroup =
@@ -36,24 +37,24 @@ export const AnalysisPage: React.FC = () => {
   const selectedTab = activeTab || currentGroup.tabs[0].key;
 
   const [period, setPeriod] = useState<AnalysisPeriod>(getDefaultAnalysisPeriod);
-  const [storeId, setStoreId] = useState<string | undefined>();
-  const systemWide = !currentStore;
+  const [storeIds, setStoreIds] = useState<string[]>([]);
 
   const query = useMemo<AnalysisQuery>(
     () => ({
       period,
-      storeId: storeId || currentStore?.id,
+      ...(storeIds.length ? { storeIds } : {}),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
-    [currentStore?.id, period, storeId],
+    [period, storeIds],
   );
 
   const filters: AnalysisFilterProps = {
     period,
     onPeriodChange: setPeriod,
-    systemWide,
-    storeId,
-    onStoreChange: (value) => setStoreId(value || undefined),
+    systemWide: true,
+    storeIds,
+    availableStores,
+    onStoresChange: setStoreIds,
   };
 
   const renderContent = () => {

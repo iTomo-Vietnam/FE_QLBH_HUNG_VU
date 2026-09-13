@@ -55,7 +55,7 @@ const Sidebar: React.FC<SideBarProps> = ({ items }) => {
         <div className="sidebar-scroll">
           <CustomMenu items={items} />
         </div>
-        <div className="sidebar-foot">{currentStore?.name || "Toàn hệ thống"} · v1.0</div>
+        <div className="sidebar-foot">{currentStore?.name || "Chưa chọn cửa hàng"} · v1.0</div>
       </div>
     </Sider>
   );

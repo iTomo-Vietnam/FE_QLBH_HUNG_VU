@@ -44,6 +44,7 @@ export const FundAddUpdateModal: React.FC<FundAddUpdateModalProps> = ({
       id,
       tempId: id,
       type: formType,
+      isPersonal: isBank ? Boolean(values.isPersonal) : false,
     };
 
     // Phạm vi sử dụng được chọn ở action riêng, không chỉnh trong form cập nhật.
@@ -126,6 +127,13 @@ export const FundAddUpdateModal: React.FC<FundAddUpdateModalProps> = ({
                 <AppSwitch label="Đang hoạt động" />
               </Form.Item>
             </Col>
+            {isBank && (
+              <Col xs={24} sm={12}>
+                <Form.Item name="isPersonal" label="Loại tài khoản" valuePropName="checked">
+                  <AppSwitch label="Tài khoản cá nhân" />
+                </Form.Item>
+              </Col>
+            )}
             <Col xs={24}>
               <Form.Item name="note" label={<Label title="Ghi chú" />}>
                 <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} />

@@ -40,7 +40,7 @@ const ProductPriceHistoryList: React.FC<{ data: Product }> = ({ data }) => {
             <div>
               <p className="text-xs text-gray-400">Chi nhánh</p>
               <p className="font-medium text-gray-700">
-                {history.store?.name || history.storeId || "Toàn hệ thống"}
+                {history.store?.name || history.storeId || "Không xác định"}
               </p>
             </div>
             <div className="text-left md:text-right">

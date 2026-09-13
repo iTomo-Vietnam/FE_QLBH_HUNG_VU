@@ -1,7 +1,7 @@
 import React from "react";
 import { Sale } from "../model";
-import { formatDateTimeDDMMYYYY } from "@/shared/utils/date.util";
-import { formatMoney, numberToVietnameseWords } from "@/shared/utils/number.util";
+import { formatDateTimeDDMMYYYY, formatVietNamDate } from "@/shared/utils/date.util";
+import { formatMoney, formatQuantity, numberToVietnameseWords } from "@/shared/utils/number.util";
 
 type PrintLine = Sale["lines"][number];
 
@@ -15,11 +15,9 @@ const getAddress = (address: unknown) => {
 
 const getStoreAddress = (sale: Sale) => getAddress(sale.store?.address);
 
-const getLineName = (line: PrintLine) =>
-  line.productSnapshot?.name || line.product?.name || "";
+const getLineName = (line: PrintLine) => line.productSnapshot?.name || line.product?.name || "";
 
-const getLineCode = (line: PrintLine) =>
-  line.productSnapshot?.code || line.product?.code || "";
+const getLineCode = (line: PrintLine) => line.productSnapshot?.code || line.product?.code || "";
 
 const getLineUnit = (line: PrintLine) =>
   line.unitSnapshot?.name || line.unit?.name || line.product?.baseUnit?.name || "";
@@ -30,8 +28,15 @@ const paidAmount = (sale: Sale) =>
       (sale.incomeExpenses || []).reduce((total, item) => total + Number(item.amount || 0), 0),
   );
 
-export const SaleA4Print: React.FC<{ data: Sale }> = ({ data }) => {
+interface SaleA4PrintProps {
+  data: Sale;
+  index?: number;
+  length?: number;
+}
+export const SaleA4Print: React.FC<SaleA4PrintProps> = ({ data, index = 1, length = 1 }) => {
   const lines = data.lines || [];
+  const totalQuantity = lines.reduce((sum, line) => sum + Number(line.quantity || 0), 0);
+  const totalTaxAmount = data.taxAmount || 0;
   const total = Number(data.totalAmount || 0);
   const paid = paidAmount(data);
   const remaining = total - paid;
@@ -66,7 +71,7 @@ export const SaleA4Print: React.FC<{ data: Sale }> = ({ data }) => {
           HÓA ĐƠN BÁN HÀNG
         </div>
         <div className="text-center">Số hóa đơn: {data.code}</div>
-        <div className="text-center">Ngày {formatDateTimeDDMMYYYY(data.orderAt)}</div>
+        <div className="text-center">Ngày {formatVietNamDate(data.orderAt)}</div>
       </header>
 
       <table className="no-border" style={{ marginTop: 10 }}>
@@ -105,21 +110,51 @@ export const SaleA4Print: React.FC<{ data: Sale }> = ({ data }) => {
               <td>{getLineCode(line)}</td>
               <td>{getLineName(line)}</td>
               <td className="text-center">{getLineUnit(line)}</td>
-              <td className="text-right">{line.quantity}</td>
-              <td className="text-right">{formatMoney(line.unitPrice)}</td>
-              <td className="text-right">{formatMoney(line.subTotal)}</td>
+              <td className="text-right">{formatQuantity(line.quantity) || "0"}</td>
+              <td className="text-right">{formatMoney(line.unitPrice) || "0"}</td>
+              <td className="text-right">{formatMoney(line.subTotal) || "0"}</td>
             </tr>
           ))}
+
+          <tr>
+            <td colSpan={4} className="text-center font-semibold">
+              Tổng cộng
+            </td>
+            <td className="text-right font-semibold">{formatQuantity(totalQuantity) || "0"}</td>
+            <td />
+            <td className="text-right font-semibold">{formatMoney(data.grossAmount) || "0"}</td>
+          </tr>
         </tbody>
       </table>
 
       <table className="no-border" style={{ marginTop: 12 }}>
         <tbody>
-          <tr><td>Tổng cộng:</td><td className="text-right">{lines.reduce((sum, line) => sum + Number(line.quantity || 0), 0)}</td><td className="text-right">{formatMoney(data.grossAmount)}</td></tr>
-          <tr><td>Chiết khấu hóa đơn:</td><td /><td className="text-right">{formatMoney(data.discountAmount)}</td></tr>
-          <tr><td>Tổng thanh toán:</td><td /><td className="text-right">{formatMoney(total)}</td></tr>
-          <tr><td>Khách hàng thanh toán:</td><td /><td className="text-right">{formatMoney(paid)}</td></tr>
-          <tr><td>Còn lại:</td><td /><td className="text-right">{formatMoney(remaining)}</td></tr>
+          <tr>
+            <td>Tổng tiền hàng:</td>
+            <td className="text-right">{formatMoney(data.grossAmount) || "0"}</td>
+          </tr>
+          <tr>
+            <td>Chiết khấu hóa đơn:</td>
+            <td className="text-right">{formatMoney(data.discountAmount) || "0"}</td>
+          </tr>
+          {totalTaxAmount > 0 && (
+            <tr>
+              <td>Thuế GTGT:</td>
+              <td className="text-right">{formatMoney(totalTaxAmount) || "0"}</td>
+            </tr>
+          )}
+          <tr>
+            <td>Tổng thanh toán:</td>
+            <td className="text-right">{formatMoney(total) || "0"}</td>
+          </tr>
+          <tr>
+            <td>Khách hàng thanh toán:</td>
+            <td className="text-right">{formatMoney(paid) || "0"}</td>
+          </tr>
+          <tr>
+            <td>Còn lại:</td>
+            <td className="text-right">{formatMoney(remaining)}</td>
+          </tr>
         </tbody>
       </table>
 
@@ -127,13 +162,27 @@ export const SaleA4Print: React.FC<{ data: Sale }> = ({ data }) => {
         Tổng thanh toán bằng chữ: {numberToVietnameseWords(total)}
       </div>
       <table className="no-border" style={{ marginTop: 25 }}>
-        <tbody><tr><td className="text-center signature">Người mua hàng</td><td className="text-center signature">Người bán hàng</td></tr></tbody>
+        <tbody>
+          <tr>
+            <td className="text-center signature">Người mua hàng</td>
+            <td className="text-center signature">Người bán hàng</td>
+          </tr>
+        </tbody>
       </table>
-      <div className="page-footer"><span>{data.store?.name || ""}</span><span>1/1</span></div>
+      <div className="page-footer">
+        <span>{data.store?.name || ""}</span>
+        <span>
+          {index}/{length}
+        </span>
+      </div>
     </article>
   );
 };
 
 export const SaleA4PrintDocument: React.FC<{ data: Sale[] }> = ({ data }) => (
-  <div>{data.map((sale) => <SaleA4Print key={sale.id} data={sale} />)}</div>
+  <div>
+    {data.map((sale, i) => (
+      <SaleA4Print key={sale.id} data={sale} index={i + 1} length={data.length} />
+    ))}
+  </div>
 );

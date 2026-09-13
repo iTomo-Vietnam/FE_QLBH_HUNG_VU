@@ -13,20 +13,10 @@ import { PermissionStructure } from "@/shared/constants/permission";
 import { ExcelRolePermissions } from "@/modules/excel/excel.permission.model";
 import { ApiRequestQuery } from "@/shared/interfaces/api";
 
-export enum RoleType {
-  SYSTEM = "system",
-  STORE = "store",
-}
-export const roleTypeMap: Record<RoleType, string> = {
-  [RoleType.SYSTEM]: "Hệ thống",
-  [RoleType.STORE]: "Cửa hàng",
-};
-
 export interface RoleQuery extends ApiRequestQuery {}
 
 export interface Role extends StoreEntity, ExcelRolePermissions {
   name: string;
   permissions: PermissionStructure;
   userCount?: number;
-  type: RoleType;
 }

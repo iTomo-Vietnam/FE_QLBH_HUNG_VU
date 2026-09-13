@@ -4,12 +4,7 @@ import { Partner } from "@/modules/partner/partner.model";
 
 export { OrderStatus, OrderType };
 
-export interface SaleReturn extends Order {
-  partner: Partner | null;
-  creatorSnapshot?: any;
-  completer?: any;
-  completerSnapshot?: any;
-}
+export interface SaleReturn extends Order {}
 
 export interface SaleReturnQuery extends ApiRequestQuery {
   type?: string;

@@ -1,15 +1,9 @@
 import { ApiRequestQuery } from "@/shared/interfaces/api";
 import { Order, OrderStatus, OrderType } from "@/modules/order/order.model";
-import { Partner } from "@/modules/partner/partner.model";
 
 export { OrderStatus, OrderType };
 
-export interface Sale extends Order {
-  partner: Partner | null;
-  creatorSnapshot?: any;
-  completer?: any;
-  completerSnapshot?: any;
-}
+export interface Sale extends Order {}
 
 export interface SaleQuery extends ApiRequestQuery {
   type?: string;

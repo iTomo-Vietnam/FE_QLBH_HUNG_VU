@@ -15,6 +15,7 @@ import {
   getDashboardDefaultTimeView,
 } from "../dashboard.model";
 import { AppSelect } from "@/shared/components";
+import { StoreUncontrolledMultipleSelect } from "@/modules/store/components";
 
 const timeOptions = dashboardTimeOptions.map((item) => ({
   value: item.value,
@@ -27,7 +28,8 @@ const calculationOptions = [
 ];
 
 export const DashboardPage: React.FC = () => {
-  const { currentStore } = useGlobalData();
+  const { getAvailableStores } = useGlobalData();
+  const availableStores = getAvailableStores("report");
   const defaultTimeView = getDashboardDefaultTimeView();
   const [revenueTimeView, setRevenueTimeView] = useState(defaultTimeView);
   const [revenueTypeView, setRevenueTypeView] = useState(DashboardTypeView.DAY);
@@ -36,6 +38,7 @@ export const DashboardPage: React.FC = () => {
   const [productTimeView, setProductTimeView] = useState(defaultTimeView);
   const [productTypeCal, setProductTypeCal] = useState(DashboardProductTypeCal.REVENUE);
   const [customerTimeView, setCustomerTimeView] = useState(defaultTimeView);
+  const [storeIds, setStoreIds] = useState<string[]>([]);
 
   const store = useDashboardStore({
     revenueTimeView,
@@ -44,9 +47,10 @@ export const DashboardPage: React.FC = () => {
     productTimeView,
     productTypeCal,
     customerTimeView,
+    storeIds,
   });
 
-  const isSystemWide = !currentStore;
+  const isSystemWide = true;
   const activeChartType = isSystemWide ? chartType : "bar";
   const totalRevenue = useMemo(
     () =>
@@ -73,6 +77,16 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="min-h-full h-fit w-full">
       <div className="mx-auto flex max-w-7xl flex-col gap-4">
+        <div className="flex justify-end">
+          <StoreUncontrolledMultipleSelect
+            value={storeIds}
+            options={availableStores}
+            onChange={setStoreIds}
+            placeholder="Tất cả chi nhánh"
+            className="min-w-[240px]"
+            maxTagCount="responsive"
+          />
+        </div>
         <section className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-base font-bold text-gray-900">Kết quả bán hàng hôm nay</h2>
           <MetricsCards data={store.metrics.data} loading={store.metrics.isLoading} />

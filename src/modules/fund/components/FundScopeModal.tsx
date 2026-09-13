@@ -153,3 +153,4 @@ export const FundScopeModal: React.FC<FundScopeModalProps> = ({
     </Modal>
   );
 };
+

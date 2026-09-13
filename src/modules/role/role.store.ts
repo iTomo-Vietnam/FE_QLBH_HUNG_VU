@@ -6,4 +6,5 @@ export const useRoleStore = createBaseStore<Role, RoleQuery>({
   key: "roles",
   apiUrl: apiEndpoint.role.base,
   permissionModule: "role",
+  storeScope: "none",
 });

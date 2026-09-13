@@ -115,3 +115,28 @@ export const StoreMultipleSelect: React.FC<MultipleSelectProps<Store, StoreQuery
     />
   );
 };
+
+export const StoreUncontrolledMultipleSelect: React.FC<MultipleSelectProps<Store, StoreQuery>> = ({
+  defaultData,
+  query,
+  options = [],
+  onChange,
+  onChangeData,
+  ...rest
+}) => {
+  const handleChange = (ids: string[]) => {
+    onChange?.(ids);
+    const selectedData = options.filter((item) => ids.includes(item.id));
+    onChangeData?.(selectedData);
+  };
+
+  return (
+    <SmartMultipleSelect<Store>
+      dataSource={options}
+      columns={columns}
+      onChange={handleChange}
+      placeholder="Chọn cửa hàng"
+      {...rest}
+    />
+  );
+};

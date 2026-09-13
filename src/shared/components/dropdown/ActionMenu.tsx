@@ -4,6 +4,8 @@ import { EllipsisHorizontalIcon, EllipsisVerticalIcon } from "@heroicons/react/2
 import { Icon } from "@iconify/react";
 
 interface DropdownActionProps {
+  size?: "small" | "middle";
+
   onCopy?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -43,6 +45,8 @@ interface DropdownActionProps {
 const iconCls = "w-7 h-7 text-white rounded-md p-1";
 
 export const DropdownAction: React.FC<DropdownActionProps> = ({
+  size = "middle",
+
   onCopy,
   onEdit,
   onDelete,
@@ -160,8 +164,8 @@ export const DropdownAction: React.FC<DropdownActionProps> = ({
     },
     print: {
       icon: "mdi:printer-outline",
-      color: "bg-blue-500",
-      textColor: "text-blue-500",
+      color: "bg-sky-500",
+      textColor: "text-sky-500",
     },
     printBarcode: {
       icon: "mdi:barcode",
@@ -339,7 +343,7 @@ export const DropdownAction: React.FC<DropdownActionProps> = ({
     onPrint && {
       label: "In phiếu",
       key: "print",
-      icon: <Icon icon="mdi:printer-outline" className={`${iconCls} bg-blue-500`} />,
+      icon: <Icon icon="mdi:printer-outline" className={`${iconCls} bg-sky-500`} />,
       onClick: onPrint,
     },
     onPrintBarcode && {
@@ -380,6 +384,9 @@ export const DropdownAction: React.FC<DropdownActionProps> = ({
     },
   ].filter((item) => item !== undefined);
 
+  const buttonSize = size === "middle" ? "h-8 w-12" : "h-6 w-10";
+  const icon = `${size === "middle" ? "w-5 h-5" : "w-4 h-4"} ${isSelected ? "text-white" : ""}`;
+
   if (items.length === 0) return null;
 
   if (items.length === 1) {
@@ -388,7 +395,12 @@ export const DropdownAction: React.FC<DropdownActionProps> = ({
       iconConfig[item.key as keyof typeof iconConfig] || iconConfig.viewDetails;
     return (
       <div className="flex justify-center items-center w-[46px]">
-        <Button htmlType="button" onClick={item.onClick} className="!p-0 border-0 mx-auto">
+        <Button
+          htmlType="button"
+          size={size}
+          onClick={item.onClick}
+          className="!p-0 border-0 mx-auto"
+        >
           <Tooltip title={item.label}>
             <span className="inline-flex">
               <Icon
@@ -420,11 +432,15 @@ export const DropdownAction: React.FC<DropdownActionProps> = ({
       arrow
       trigger={["click"]}
     >
-      <span className="flex items-center justify-center h-8 w-12 hover:text-gray-800 rounded hover:bg-gray-100 cursor-pointer">
+      <span
+        className={`
+          flex items-center justify-center ${buttonSize} hover:text-gray-800 rounded hover:bg-gray-100 cursor-pointer
+        `}
+      >
         {type === "vertical" ? (
-          <EllipsisVerticalIcon className={isSelected ? "w-5 h-5 text-white" : "w-5 h-5"} />
+          <EllipsisVerticalIcon className={icon} />
         ) : (
-          <EllipsisHorizontalIcon className={isSelected ? "w-5 h-5 text-white" : "w-5 h-5"} />
+          <EllipsisHorizontalIcon className={icon} />
         )}
       </span>
     </Dropdown>

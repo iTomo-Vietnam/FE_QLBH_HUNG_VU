@@ -25,6 +25,7 @@ export interface FundSnapshot {
   name: string;
   type: FundType;
   storeId?: string | null;
+  isPersonal?: boolean;
 }
 
 export interface Fund extends Entity {
@@ -32,6 +33,7 @@ export interface Fund extends Entity {
   name: string;
   type: FundType;
   storeId: string | null;
+  isPersonal: boolean;
   store?: Store | null;
   bank?: string | null;
   accountNumber?: string | null;

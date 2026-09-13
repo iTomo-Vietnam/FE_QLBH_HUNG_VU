@@ -25,11 +25,12 @@ export const FundDetailModal: React.FC<DetailModalProps<Fund>> = ({
         <Descriptions.Item label="Tên quỹ">{data.name}</Descriptions.Item>
         <Descriptions.Item label="Loại quỹ">{fundTypeMap[data.type] || data.type}</Descriptions.Item>
         <Descriptions.Item label="Phạm vi sử dụng">
-          {data.storeId ? data.store?.name || "Cửa hàng" : "Toàn hệ thống"}
+          {data.storeId ? data.store?.name || "Cửa hàng" : "Tài khoản dùng chung toàn hệ thống"}
         </Descriptions.Item>
         {data.type === "bank" && (
           <>
             <Descriptions.Item label="Ngân hàng">{data.bank || "—"}</Descriptions.Item>
+            <Descriptions.Item label="Loại tài khoản">{data.isPersonal ? "Cá nhân" : "Công ty"}</Descriptions.Item>
             <Descriptions.Item label="Số tài khoản">
               {data.accountNumber || "—"}
             </Descriptions.Item>

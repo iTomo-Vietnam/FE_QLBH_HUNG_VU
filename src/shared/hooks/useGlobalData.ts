@@ -17,7 +17,7 @@ import {
 import { ThemeMode } from "@/shared/interfaces/common";
 import { UserInfo } from "../interfaces/auth";
 import { Store } from "@/shared/base/entity";
-import { privateRoutesName } from "../constants/routerName";
+import { Module, readPermissionFallbackMap } from "../constants";
 
 export const useGlobalData = () => {
   const dispatch = useDispatch();
@@ -35,6 +35,7 @@ export const useGlobalData = () => {
     filter,
     currentStore,
   } = useSelector((state: RootState) => state.Global, shallowEqual);
+  const allStores = info?.allStores || [];
 
   const handleSetIsMobile = useCallback(
     (isMobile: boolean) => {
@@ -120,6 +121,30 @@ export const useGlobalData = () => {
     dispatch(clearState());
   }, [dispatch]);
 
+  const getAvailableStores = useCallback(
+    (module: Module): Store[] => {
+      if (!info) return [];
+      if (info.isAdmin) return allStores;
+
+      const fallbackModules = readPermissionFallbackMap[module] || [];
+      const hasReadPermission = (permissions?: Record<string, string[]>) =>
+        Boolean(
+          permissions?.[module]?.includes("read") ||
+            fallbackModules.some(
+              (fallback) =>
+                permissions?.[fallback]?.includes("read") ||
+                permissions?.[fallback]?.includes("create"),
+            ),
+        );
+
+      return (info.storeUsers || [])
+        .filter((storeUser) => hasReadPermission(storeUser.role?.permissions))
+        .map((storeUser) => storeUser.store)
+        .filter((store): store is Store => Boolean(store));
+    },
+    [allStores, info],
+  );
+
   return {
     currentStore,
     horizontal,
@@ -133,6 +158,8 @@ export const useGlobalData = () => {
     customTitle,
     themeMode,
     filter,
+    allStores,
+    getAvailableStores,
     handleSetIsMobile,
     handleSetTotalUnread,
     handleSetCustomTitle,

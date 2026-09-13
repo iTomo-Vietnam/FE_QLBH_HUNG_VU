@@ -1,5 +1,4 @@
 import { Attribute as AttributeModel } from "@/modules/attribute/attribute.model";
-import { Role } from "@/modules/role/role.model";
 import { User, Store } from "@/shared/base/entity";
 import { Module, PermissionStructure } from "@/shared/constants/permission";
 import { FormatData } from "@/shared/interfaces/format";
@@ -67,7 +66,6 @@ export interface UserInfo extends User {
 
   isAdmin?: boolean;
 
-  role: Role | null;
   permissions: PermissionStructure | null;
 
   allStores: Store[];

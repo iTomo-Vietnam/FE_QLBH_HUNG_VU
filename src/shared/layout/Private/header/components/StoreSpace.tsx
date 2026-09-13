@@ -11,47 +11,27 @@ import { CheckIcon, ServerStackIcon, XMarkIcon } from "@heroicons/react/24/outli
 import { CaretDownFilled } from "@ant-design/icons";
 
 export const StoreSpace: React.FC = () => {
-  const [showStores, setShowStores] = useState<boolean>(false);
-  const StoreIconRef = useRef<HTMLDivElement>(null);
-  const StoreTableRef = useRef<HTMLDivElement>(null);
+  const [showStores, setShowStores] = useState(false);
+  const storeIconRef = useRef<HTMLDivElement>(null);
+  const storeTableRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  const {
-    info,
-    permissions,
-    currentStore,
-    isMobile,
-    collapsed,
-    horizontal,
-    handleSetCurrentStore,
-  } = useGlobalData();
-
-  const showSpace = !collapsed || horizontal;
-  const allStores = info?.allStores || [];
+  const { allStores, permissions, currentStore, isMobile, horizontal, handleSetCurrentStore } =
+    useGlobalData();
 
   useEffect(() => {
     if (isMobile) return;
-
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        StoreIconRef.current &&
-        !StoreIconRef.current.contains(event.target as Node) &&
-        StoreTableRef.current &&
-        !StoreTableRef.current.contains(event.target as Node)
+        storeIconRef.current &&
+        !storeIconRef.current.contains(event.target as Node) &&
+        storeTableRef.current &&
+        !storeTableRef.current.contains(event.target as Node)
       ) {
         setShowStores(false);
       }
     };
-
-    if (showStores) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (showStores) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showStores, isMobile]);
 
   return (
@@ -67,96 +47,64 @@ export const StoreSpace: React.FC = () => {
         className={`flex items-center cursor-pointer relative select-none h-8 p-1 pr-3 rounded-lg ${
           horizontal ? "hover:bg-[#b9d1e4]" : "hover:bg-gray-100"
         } transition-all ease-in-out`}
-        style={{
-          width: "calc(100% - 40px)",
-        }}
-        ref={StoreIconRef}
+        style={{ width: "calc(100% - 40px)" }}
+        ref={storeIconRef}
         onClick={() => setShowStores((prev) => !prev)}
       >
         <Typography.Text className="flex w-full justify-between gap-2 font-medium text-sm text-[#333] truncate">
           <span
             className="truncate min-w-[56px] max-w-[140px]"
-            title={currentStore ? currentStore.name : "Toàn hệ thống"}
+            title={currentStore?.name || "Chưa chọn cửa hàng"}
           >
-            {currentStore ? currentStore.name : "Toàn hệ thống"}
+            {currentStore?.name || "Chưa chọn cửa hàng"}
           </span>
           <CaretDownFilled className="text-[#666]" />
         </Typography.Text>
 
         {showStores && (
           <div
-            className="
-            absolute flex flex-col min-w-[342px] gap-4 -left-10 xl:left-auto xl:right-0 p-3
-            top-12 sm:right-0 -mt-2 bg-white drop-shadow-2xl !rounded-xl z-50 store__table w-28"
-            ref={StoreTableRef}
-            onClick={(e) => e.stopPropagation()}
+            className="absolute flex flex-col min-w-[342px] gap-4 -left-10 xl:left-auto xl:right-0 p-3 top-12 sm:right-0 -mt-2 bg-white drop-shadow-2xl !rounded-xl z-50 store__table w-28"
+            ref={storeTableRef}
+            onClick={(event) => event.stopPropagation()}
             style={CSS.container}
           >
             <div className="flex justify-between items-center h-8 text-[#333]">
               <span className="font-medium">Chuyển cửa hàng</span>
               <button
                 className="h-8 w-8 p-[6px] bg-slate-100 rounded text-gray-400 hover:text-gray-500"
-                onClick={(e) => setShowStores(false)}
+                onClick={() => setShowStores(false)}
               >
                 <XMarkIcon />
               </button>
             </div>
             <div className="flex flex-col gap-1 h-[200px] overflow-y-auto">
-              {checkModule(permissions, "store") && (
+              {allStores.map((store) => (
                 <div
+                  key={store.id}
                   className="flex gap-2 h-10 px-2 py-[6px] items-center transition-all ease-in-out hover:bg-gray-100 rounded-normal"
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  onClick={() => {
                     setShowStores(false);
-                    handleSetCurrentStore();
+                    if (currentStore?.id !== store.id) handleSetCurrentStore(store);
                   }}
                 >
                   <div className="flex items-center justify-center h-6 w-6">
-                    {currentStore === null && <CheckIcon className="text-gray-500 h-4 w-4" />}
+                    {currentStore?.id === store.id && <CheckIcon className="text-gray-500 h-4 w-4" />}
                   </div>
-
-                  <div className="flex items-center justify-center h-7 w-7">
-                    <ServerStackIcon className="h-6 w-6 text-gray-500" />
+                  <div className="rounded-full flex gap-2 h-7 w-7 justify-center items-center overflow-hidden">
+                    <StoreImage image={getMainFile(store.image)} size={28} shape="circle" />
                   </div>
-
-                  <span className="w-[calc(100%-68px)] font-medium truncate">Toàn hệ thống</span>
+                  <span className="w-[calc(100%-68px)] truncate" title={store.name}>
+                    {store.name}
+                  </span>
                 </div>
-              )}
-              {allStores.map((item, index) => {
-                return (
-                  <div
-                    key={item.id}
-                    className="flex gap-2 h-10 px-2 py-[6px] items-center transition-all ease-in-out hover:bg-gray-100 rounded-normal"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowStores(false);
-                      if (currentStore?.id === item.id) return;
-                      handleSetCurrentStore(item);
-                    }}
-                  >
-                    <div className="flex items-center justify-center h-6 w-6">
-                      {currentStore?.id === item.id && (
-                        <CheckIcon className="text-gray-500 h-4 w-4" />
-                      )}
-                    </div>
-                    <div className="rounded-full flex gap-2 h-7 w-7 justify-center items-center overflow-hidden">
-                      <StoreImage image={getMainFile(item?.image)} size={28} shape="circle" />
-                    </div>
-                    <span className="w-[calc(100%-68px)] truncate" title={item.name}>
-                      {item.name}
-                    </span>
-                  </div>
-                );
-              })}
+              ))}
             </div>
             {checkModule(permissions, "store") && (
               <button
                 className="flex h-10 justify-center items-center bg-gray-50 border hover:bg-gray-100 transition-all ease-in-out font-medium gap-2 rounded-md text-[#666]"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   navigate(privateRoutesName.setup.store);
                   setShowStores(false);
-                  handleSetCurrentStore();
                 }}
               >
                 <ServerStackIcon className="h-6 w-6" /> Quản lý cửa hàng

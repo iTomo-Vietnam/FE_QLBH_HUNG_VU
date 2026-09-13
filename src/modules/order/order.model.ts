@@ -1,6 +1,6 @@
-import { Entity, Store } from "@/shared/base/entity";
+import { Entity, Store, StoreEntity, User, UserSnapshot } from "@/shared/base/entity";
 import { ApiRequestQuery } from "@/shared/interfaces/api";
-import { PartnerSnapshot } from "../partner/partner.model";
+import { Partner, PartnerSnapshot } from "../partner/partner.model";
 import { ProductSnapshot } from "../product/product.model";
 import { AttributeSnapshot } from "../attribute/attribute.model";
 import { DiscountType } from "@/shared/constants/enum";
@@ -68,63 +68,86 @@ export interface OrderLine extends Entity {
   type?: string;
 }
 
-export interface Order extends Entity {
-  storeId: string;
-  store?: Store;
+export interface Order extends StoreEntity {
   type: OrderType;
   status: OrderStatus;
+
   code: string;
-  orderAt: string;
-  occurredAt: string | null;
-  canceledAt: string | null;
+  invoiceNumber: string | null; // số hóa đơn đầu vào
+  orderAt: Date; // ngày thực hiện đơn hàng
+  occurredAt: Date | null; // ngày thực hiện nhập/xuất kho, có thể khác orderAt
+  canceledAt: Date | null; // ngày hủy đơn hàng, chỉ có khi status = CANCELED
+
   partnerId: string | null;
   partnerSnapshot: PartnerSnapshot | null;
-  shipperId: string | null;
-  shipperSnapshot: PartnerSnapshot | null;
-  shippingFee: number | null;
-  /** Purchase: doanh nghiệp tự thanh toán; sale: miễn phí cho khách. */
-  isFreeShipping: boolean;
+  partner: Partner | null;
+
+  // TODO ===== Người hoàn thành đơn hàng (có thể khác creator) =====
+  completerId: string | null;
+  completerSnapshot?: UserSnapshot | null;
+  completer?: User | null;
+
+  // TODO ===== Người hủy đơn hàng (có thể khác creator) =====
+  cancelerId: string | null;
+  cancelerSnapshot: UserSnapshot | null;
+  canceler: User | null;
+
+  // TODO ===== Discount (order-level) =====
   discountType: DiscountType;
   discountValue: number | null;
+
+  // TODO ===== Tax =====
+  taxType: DiscountType;
+  taxValue: number | null;
+
+  // TODO ===== Shipping Info =====
+  shipperId: string | null;
+  shipperSnapshot: PartnerSnapshot | null;
+  shipper: Partner | null;
+
+  shippingFee: number | null; // phí vận chuyển
+  isFreeShipping: boolean; // mua: DN tự thanh toán; bán: miễn phí cho khách
+
+  // TODO ===== Financial summary =====
   grossAmount: number;
   discountAmount: number | null;
   netAmount: number;
-  taxType: DiscountType;
-  taxValue: number | null;
   taxAmount: number;
   totalAmount: number;
+
   totalCost: number;
+
+  // TODO ===== Return Order =====
   refOrderId: string | null;
-  refOrder?: Order | null;
-  returnGrossAmount: number;
+  refOrder?: Order | null; // đơn hàng gốc bị trả
+
   returnDiscountType: DiscountType;
   returnDiscountValue: number | null;
-  returnDiscountAmount: number | null;
-  returnNetAmount: number;
+
   returnTaxType: DiscountType;
   returnTaxValue: number | null;
+
+  returnGrossAmount: number;
+  returnDiscountAmount: number | null;
+  returnNetAmount: number;
   returnTaxAmount: number;
   returnTotalAmount: number;
+
   returnTotalCost: number;
-  settlementAmount: number;
+
+  // TODO: Giá trị thực tế cần thanh toán (có thể âm hoặc dương)
+  settlementAmount: number; // = totalAmount - returnTotalAmount
+
+  incomeExpenses: IncomeExpense[];
+
   lines: OrderLine[];
+
   returnLines: OrderLine[];
-  incomeExpenses?: IncomeExpense[];
-  /** Deprecated aliases used by old print views. */
-  timeAt?: string;
-  customerId?: string | null;
-  customer?: any;
-  staffId?: string | null;
-  staff?: any;
-  isCompleted?: boolean;
-  completedAt?: string | null;
-  commissionMode?: any;
-  taxRate?: number;
 
   // TODO: Các trường khác (nếu có) sẽ được lưu trong metadata
   paidAmount?: number; // số tiền đã thanh toán (nếu có)
-  customerPaidAmount?: number; // tổng tiền khách đã thanh toán
-  refundedAmount?: number; // tổng tiền đã hoàn khách
+  customerPaidAmount?: number; // tổng phiếu thu của đơn hàng
+  refundedAmount?: number; // tổng phiếu chi của đơn hàng
   amountToRefund?: number; // số tiền cần trả khách
   amountToCollect?: number; // số tiền cần thu thêm
   actualShippingFee?: number; // phí vận chuyển thực tế (nếu có)

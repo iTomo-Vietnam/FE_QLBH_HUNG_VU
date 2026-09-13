@@ -25,7 +25,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 const SalePage: React.FC = () => {
-  const { currentStore } = useGlobalData();
+  const { getAvailableStores } = useGlobalData();
   const navigate = useNavigate();
   const [statusValues, setStatusValues] = useState<OrderStatus[]>([
     OrderStatus.DRAFT,
@@ -42,6 +42,7 @@ const SalePage: React.FC = () => {
     sortOrder: state.sortOrder,
     reload: state.reload,
     statuses: statusValues,
+    storeIds: state.storeIds,
     ...state.filter,
     ...state.ranger,
   });
@@ -105,6 +106,9 @@ const SalePage: React.FC = () => {
           !statusValues.includes(OrderStatus.DRAFT) ||
           !statusValues.includes(OrderStatus.COMPLETED)
         }
+        storeIds={state.storeIds}
+        availableStores={getAvailableStores("sale")}
+        onStoreIdsChange={state.pageAction.handleSetStoreIds}
         sortItems={sortItems}
         sortValue={{ sortBy: state.sortBy, sortOrder: state.sortOrder }}
         onSortChange={state.pageAction.handleSortChange}
@@ -206,6 +210,7 @@ const SalePage: React.FC = () => {
             state: { openSourcePicker: true },
           })
         }
+        onPrint={handlers.handlePrint}
       />
       <div className="pointer-events-none fixed left-[-100000px] top-0" aria-hidden="true">
         <div ref={contentRef}>{printData && <SaleA4PrintDocument data={printData} />}</div>

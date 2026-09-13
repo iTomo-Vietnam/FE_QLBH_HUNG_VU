@@ -31,21 +31,20 @@ export function createBaseReportStore<
   key: string;
   apiUrl: string;
   permissionModule?: Module | string;
+  /** Reports are scoped by the backend to all stores readable by the user. */
+  storeScope?: "available" | "current" | "none";
 }): (params?: TQuery) => BaseReportStoreReturn<TReport, TTransaction> {
   return function useBaseReportStore(
     params?: TQuery,
   ): BaseReportStoreReturn<TReport, TTransaction> {
-    const { permissions, currentStore } = useGlobalData();
+    const { permissions } = useGlobalData();
 
     const can = config.permissionModule
       ? (permission: Permission) =>
           checkPermission(permissions, config.permissionModule! as Module, permission)
       : () => true;
 
-    const paramsWithStore = {
-      ...params,
-      storeId: currentStore?.id ?? params?.storeId,
-    };
+    const paramsWithStore = { ...params };
     const reportQuery = useQuery<ApiResponse<TReport[]>, BaseFailurePayload>({
       queryKey: [config.key, "report", paramsWithStore],
       placeholderData: keepPreviousData,

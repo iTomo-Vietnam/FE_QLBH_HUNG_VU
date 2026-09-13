@@ -87,7 +87,7 @@ export const usePosSubmit = ({
         ...(mode === "edit" && sourceId ? { id: sourceId } : { tempId: cacheId }),
         storeId: currentStoreId,
         type: type as Order["type"],
-        orderAt: String(activeOrder.orderAt || new Date().toISOString()),
+        orderAt: new Date(String(activeOrder.orderAt || new Date().toISOString())),
         ...(type === OrderType.SALE_RETURN
           ? {
               returnDiscountType: (activeOrder.returnDiscountType ||

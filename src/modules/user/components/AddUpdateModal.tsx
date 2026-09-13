@@ -1,11 +1,6 @@
 import React, { useEffect } from "react";
-import { Col, Empty, Form, Input, Modal, Row, Switch } from "antd";
-import {
-  AppSwitch,
-  SortableItem,
-  SubmitButton,
-  Title,
-} from "@/shared/components";
+import { Col, Empty, Form, Input, Modal, Row } from "antd";
+import { SortableItem, SubmitButton, Title } from "@/shared/components";
 import { Label } from "@/shared/components";
 import { AddUpdateModalProps } from "@/shared/interfaces/common";
 import { setFormErrors } from "@/shared/utils/form.util";
@@ -13,7 +8,6 @@ import { handleCloseWithPendingFiles, randomId } from "@/shared/utils/common.uti
 import { formatFormData, makeFormListEnterHandler, parseFormDataDates } from "@/shared/utils";
 import { useAppMessage, useAutoResetItem } from "@/shared/hooks";
 import { RoleSelect } from "@/modules/role/components/Select";
-import { RoleType } from "@/modules/role/role.model";
 import { User } from "../user.model";
 import { Store } from "@/shared/base/entity";
 import { StoreMultipleSelect } from "@/modules/store/components/Select";
@@ -32,15 +26,12 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
   const [form] = Form.useForm<User>();
   const [defaultValue, setDefaultValue] = useAutoResetItem<Store>();
   const id = editData?.id || randomId();
-  const role = Form.useWatch("role", form);
   const storeUsers = Form.useWatch("storeUsers", form) || [];
   const hideStores = storeUsers
     .map((storeUser) => storeUser.store)
     .filter((store): store is Store => Boolean(store));
 
   const { message, showFormErrorMessages } = useAppMessage();
-
-  const isRoleStore = role?.type === RoleType.STORE;
 
   useEffect(() => {
     if (errors) setFormErrors(form, errors);
@@ -51,7 +42,7 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
     editData ? onEdit?.(payload) : onAdd?.(payload);
   };
 
-  const colgroupWidthConfig = [undefined, 32];
+  const colgroupWidthConfig = [undefined, 220, 32];
   return (
     <Modal
       open={open}
@@ -130,7 +121,7 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
               <Input />
             </Form.Item>
           </Col>
-          <Col xs={24} lg={12}>
+          {/* <Col xs={24} lg={12}>
             <Form.Item name="roleId" label="Vai trò">
               <RoleSelect
                 defaultData={role}
@@ -143,12 +134,12 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
             <Form.Item name="isActive" label="Đang hoạt động" valuePropName="checked">
               <AppSwitch label="Cho phép truy cập hệ thống" />
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col xs={24}>
             <Form.List name="storeUsers">
               {(fields, { add, remove }) => (
                 <div
-                  className={`${isRoleStore ? "flex" : "hidden"} flex-col w-full min-h-56 mt-4`}
+                  className={`flex flex-col w-full min-h-56 mt-4`}
                   onKeyDown={makeFormListEnterHandler(
                     {
                       type: "select",
@@ -171,6 +162,7 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
                           add({
                             storeId: value.id,
                             store: value,
+                            roleId: null,
                             tempId: randomId(),
                           });
                         }}
@@ -206,6 +198,22 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
                               <div className="flex items-center gap-2 p-2">
                                 <span className="block truncate">{store?.name}</span>
                               </div>
+                            </td>
+
+                            <td className="px-2">
+                              <Form.Item
+                                name={[name, "roleId"]}
+                                className="mb-0"
+                                rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
+                              >
+                                <RoleSelect
+                                  defaultData={storeUsers?.[name]?.role}
+                                  query={{ storeId: store?.id }}
+                                  onChangeData={(selectedRole) =>
+                                    form.setFieldValue(["storeUsers", name, "role"], selectedRole)
+                                  }
+                                />
+                              </Form.Item>
                             </td>
 
                             <td className="pr-2">

@@ -23,6 +23,7 @@ export const useDashboardStore = ({
   productTimeView,
   productTypeCal,
   customerTimeView,
+  storeIds,
 }: {
   revenueTimeView: DashboardTimeView;
   revenueTypeView: DashboardTypeView;
@@ -30,6 +31,7 @@ export const useDashboardStore = ({
   productTimeView: DashboardTimeView;
   productTypeCal: DashboardProductTypeCal;
   customerTimeView: DashboardTimeView;
+  storeIds?: string[];
 }) => {
   const { currentStore } = useGlobalData();
   const storeKey = currentStore?.id || "all-stores";
@@ -37,7 +39,7 @@ export const useDashboardStore = ({
   const metrics = useQuery({
     queryKey: ["dashboard", "metrics", storeKey],
     queryFn: () =>
-      getData<DashboardMetrics>(apiEndpoint.dashboard.metrics).then(unwrap),
+      getData<DashboardMetrics>(apiEndpoint.dashboard.metrics, storeIds?.length ? { storeIds } : undefined).then(unwrap),
     placeholderData: keepPreviousData,
   });
 
@@ -55,6 +57,7 @@ export const useDashboardStore = ({
         timeView: revenueTimeView,
         typeView: revenueTypeView,
         typeCal: revenueTypeCal,
+        ...(storeIds?.length ? { storeIds } : {}),
       }).then(unwrap),
     placeholderData: keepPreviousData,
   });
@@ -65,6 +68,7 @@ export const useDashboardStore = ({
       getData<DashboardTopProduct[]>(apiEndpoint.dashboard.topProducts, {
         timeView: productTimeView,
         typeCal: productTypeCal,
+        ...(storeIds?.length ? { storeIds } : {}),
       }).then(unwrap),
     placeholderData: keepPreviousData,
   });
@@ -74,6 +78,7 @@ export const useDashboardStore = ({
     queryFn: () =>
       getData<DashboardTopCustomer[]>(apiEndpoint.dashboard.topCustomers, {
         timeView: customerTimeView,
+        ...(storeIds?.length ? { storeIds } : {}),
       }).then(unwrap),
     placeholderData: keepPreviousData,
   });

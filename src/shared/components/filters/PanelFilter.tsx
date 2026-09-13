@@ -1,4 +1,4 @@
-import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { FunnelIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { RangerItemPanel } from "./RangerItemPanel";
 import { SearchItemPanel } from "./SearchPanel";
 import { SortSelect } from "./SortSelect";
@@ -16,6 +16,10 @@ import React from "react";
 import { FilterPanel } from "./FilterPanel";
 import { ProvinceSelect, WardSelect } from "../select/AddressSelect";
 import { useAddressSelector } from "@/shared/hooks/useAddressSelector";
+import { GenericFilter } from "./FilterPanel/GenericFilter";
+import { Store, StoreUncontrolledMultipleSelect } from "@/modules/store";
+import { StoreImage } from "../image";
+import { getMainFile } from "@/shared/utils";
 
 export interface EnumFilterItem {
   key: string;
@@ -75,6 +79,11 @@ const AddressFilter: React.FC<AddressFilterConfig> = ({
 
 export interface PanelFilterProps {
   filterActive?: boolean;
+
+  storeIds?: string[];
+  availableStores?: Store[];
+  onStoreIdsChange?: (storeIds: string[]) => void;
+
   className?: string;
   style?: React.CSSProperties;
   status?: string;
@@ -99,6 +108,11 @@ export interface PanelFilterProps {
 
 export const PanelFilter: React.FC<PanelFilterProps> = ({
   filterActive,
+
+  storeIds,
+  availableStores,
+  onStoreIdsChange,
+
   className = "",
   style,
   status,
@@ -122,6 +136,7 @@ export const PanelFilter: React.FC<PanelFilterProps> = ({
   addressFilter,
   onClearFilter,
 }) => {
+  const filterStore = availableStores?.filter((store) => storeIds?.includes(store.id)) || [];
   return (
     <aside
       className={`flex h-full w-64 shrink-0 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white ${className}`}
@@ -140,6 +155,42 @@ export const PanelFilter: React.FC<PanelFilterProps> = ({
         )}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
+        {!!onStoreIdsChange && (
+          <div className="flex flex-col w-full h-fit gap-4 border-b border-gray-100">
+            <div className="flex flex-col w-full gap-2 p-4 pt-2">
+              <span className="font-semibold text-xs uppercase tracking-wide text-gray-500">
+                Cửa hàng
+              </span>
+              <GenericFilter<Store>
+                data={filterStore}
+                selectComponent={
+                  <StoreUncontrolledMultipleSelect
+                    value={storeIds}
+                    options={availableStores}
+                    prefix={<MagnifyingGlassIcon className="h-4" />}
+                    suffixIcon={null}
+                    placeholder="Tìm kiếm cửa hàng..."
+                    onChange={onStoreIdsChange}
+                  />
+                }
+                renderItem={(item) => (
+                  <div className="flex items-center gap-1 w-[calc(100%-36px)] py-1">
+                    <StoreImage image={getMainFile(item.logo)} size={28} />
+                    <div className="flex min-w-0 flex-col w-[calc(100%-36px)]">
+                      <span className="truncate leading-4">{item.name}</span>
+                      <span className="truncate text-xs text-[#909090]">{item.code}</span>
+                    </div>
+                  </div>
+                )}
+                onRemove={(id) =>
+                  onStoreIdsChange(
+                    filterStore.filter((item) => item.id !== id).map((item) => item.id),
+                  )
+                }
+              />
+            </div>
+          </div>
+        )}
         {searchItems.length > 0 && (
           <section>
             <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -218,7 +269,7 @@ export const PanelFilter: React.FC<PanelFilterProps> = ({
                 {hasSelection && (
                   <button
                     type="button"
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className="text-xs text-primary hover:text-primary/80"
                     onClick={() => config.onChange([])}
                   >
                     Bỏ lọc
@@ -246,8 +297,8 @@ export const PanelFilter: React.FC<PanelFilterProps> = ({
                       }}
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         isSelected
-                          ? "border-blue-600 bg-blue-600 text-white"
-                          : "border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600"
+                          ? "border-primary bg-primary text-white"
+                          : "border-gray-300 text-gray-600 hover:border-blue-400 hover:text-primary"
                       }`}
                     >
                       {item.label}

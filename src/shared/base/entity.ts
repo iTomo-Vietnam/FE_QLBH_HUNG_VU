@@ -1,4 +1,3 @@
-import { Role } from "@/modules/role/role.model";
 import { FileCategory, Gender } from "@/shared/constants";
 import { Address } from "@/shared/interfaces";
 
@@ -87,9 +86,6 @@ export interface User extends Entity {
   dob: Date | null;
   address: Address | null;
 
-  roleId: string | null;
-  role: Role | null;
-
   isActive: boolean;
 
   notifications?: Notification[];
@@ -138,4 +134,6 @@ export interface StoreEntity extends Entity {
 
 export interface StoreUser extends StoreEntity {
   userId: string;
+  roleId: string | null;
+  role?: import("@/modules/role/role.model").Role | null;
 }

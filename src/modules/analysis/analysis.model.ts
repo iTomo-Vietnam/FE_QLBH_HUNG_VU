@@ -5,6 +5,7 @@ export type AnalysisPeriod = string;
 export interface AnalysisQuery {
   period: AnalysisPeriod;
   storeId?: string;
+  storeIds?: string[];
   sortBy?: AnalysisSortBy;
   timezone?: string;
 }

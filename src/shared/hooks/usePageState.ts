@@ -31,9 +31,16 @@ interface UsePageStateProps {
 }
 
 export function usePageState<T extends Entity = any>(params?: UsePageStateProps) {
-  const { filter, handleSetFilter } = useGlobalData();
+  const { filter, currentStore, handleSetFilter } = useGlobalData();
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm<T>();
+  const [storeIds, setStoreIds] = useState<string[]>(currentStore ? [currentStore.id] : []);
+
+  useEffect(() => {
+    if (currentStore?.id && storeIds.length === 0) {
+      setStoreIds([currentStore.id]);
+    }
+  }, [currentStore?.id, storeIds.length]);
   const [open, setOpen] = useState<boolean>(params?.open || false);
   const [openDetail, setOpenDetail] = useState<boolean>(params?.openDetail || false);
   const [openDelete, setOpenDelete] = useState<boolean>(params?.openDelete || false);
@@ -107,6 +114,11 @@ export function usePageState<T extends Entity = any>(params?: UsePageStateProps)
       socket.off("notification", () => setReload((prev) => !prev));
     };
   }, []);
+
+  function handleSetStoreIds(newStoreIds: string[]) {
+    setStoreIds(newStoreIds);
+    setPage(1);
+  }
 
   function updateDataSource(newData: T[], page?: number) {
     if (page === 1) {
@@ -209,6 +221,7 @@ export function usePageState<T extends Entity = any>(params?: UsePageStateProps)
   }
 
   const pageAction = {
+    handleSetStoreIds,
     handleFilterChange,
     handleRangerChange,
     handleSearchChange,
@@ -236,6 +249,7 @@ export function usePageState<T extends Entity = any>(params?: UsePageStateProps)
     id,
     form,
     __unCloseAfterSucess,
+    storeIds,
     open,
     setOpen,
     openDetail,

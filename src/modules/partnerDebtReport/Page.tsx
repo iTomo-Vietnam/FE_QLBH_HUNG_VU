@@ -11,8 +11,13 @@ import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { useState } from "react";
 import { DebtSide, debtSideOptions, SortOrder } from "@/shared/constants/enum";
 import { Radio } from "antd";
+import { StoreUncontrolledMultipleSelect } from "@/modules/store/components";
+import { useGlobalData } from "@/shared/hooks/useGlobalData";
 
 export const PartnerDebtReportPage: React.FC = () => {
+  const { getAvailableStores } = useGlobalData();
+  const [storeIds, setStoreIds] = useState<string[]>([]);
+  const availableStores = getAvailableStores("debtReport");
   const {
     isFilterActive,
     keyword,
@@ -75,6 +80,7 @@ export const PartnerDebtReportPage: React.FC = () => {
     side,
     ...filter,
     ...ranger,
+    ...(storeIds.length ? { storeIds } : {}),
   });
 
   const handleOpenDetailModal = (record: PartnerDebtReport) => {
@@ -99,6 +105,13 @@ export const PartnerDebtReportPage: React.FC = () => {
           buttonStyle="solid"
         />
         <div className="flex items-center gap-3 flex-shrink-0">
+          <StoreUncontrolledMultipleSelect
+            value={storeIds}
+            options={availableStores}
+            onChange={setStoreIds}
+            className="w-56"
+            placeholder="Chọn chi nhánh"
+          />
           <SearchInput value={keyword} onSearch={pageAction.handleSearch} maxWidth={480} />
           <DateRangeFilter
             startDate={startAt}

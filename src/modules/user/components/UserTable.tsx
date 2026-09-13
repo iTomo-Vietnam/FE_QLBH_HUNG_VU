@@ -4,8 +4,10 @@ import { UserImage } from "@/shared/components";
 import { getMainFile } from "@/shared/utils/file.util";
 import { ContentTooltip } from "@/shared/components";
 import { UserActiveTag } from "./Tag";
+import { useGlobalData } from "@/shared/hooks/useGlobalData";
 
 export const UserTable: React.FC<ObjectTableProps> = ({ ...rest }) => {
+  const { currentStore } = useGlobalData();
   const columns: any = [
     {
       title: "Mã ND",
@@ -46,9 +48,11 @@ export const UserTable: React.FC<ObjectTableProps> = ({ ...rest }) => {
     },
     {
       title: "Vai trò hệ thống",
-      dataIndex: ["role", "name"],
+      dataIndex: "storeUsers",
       key: "roleName",
       width: 150,
+      render: (storeUsers: User["storeUsers"]) =>
+        storeUsers?.find((membership) => membership.storeId === currentStore?.id)?.role?.name || "--",
     },
     {
       title: "Ghi chú",

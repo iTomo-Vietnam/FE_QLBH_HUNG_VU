@@ -94,7 +94,8 @@ const UserBar: React.FC<UserBarProps> = ({}) => {
             <div className="flex flex-col select-none">
               <Text className="font-semibold leading-5">{info?.name}</Text>
               <Text className="text-gray-400 truncate leading-5">
-                {info?.role?.name || info?.username || info?.code}
+                {info?.storeUsers?.find((membership) => membership.storeId === info.currentStore?.id)?.role
+                  ?.name || info?.username || info?.code}
               </Text>
             </div>
           </div>

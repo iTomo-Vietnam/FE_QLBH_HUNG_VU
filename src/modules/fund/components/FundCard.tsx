@@ -33,6 +33,9 @@ export const FundCard: React.FC<FundCardProps> = ({
   const isBank = item.type === FundType.BANK;
   const isLocked = Boolean(item.isDefault);
   const Icon = isBank ? CreditCardIcon : BanknotesIcon;
+  const scopeLabel = item.storeId ? item.store?.name || "Cửa hàng" : "Tài khoản dùng chung";
+  const accountLabel = item.isPersonal ? "Cá nhân" : "Công ty";
+  const activeLabel = item.isActive ? "Đang hoạt động" : "Đã khóa";
 
   return (
     <Card
@@ -71,6 +74,14 @@ export const FundCard: React.FC<FundCardProps> = ({
             <h3 className="mt-1 truncate text-base font-semibold text-gray-900 dark:text-gray-100">
               {item.name}
             </h3>
+            <div className="mt-1 flex flex-wrap gap-1 text-xs">
+              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                {scopeLabel}
+              </span>
+              <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                {accountLabel}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -78,7 +89,7 @@ export const FundCard: React.FC<FundCardProps> = ({
           className="flex shrink-0 items-center gap-1"
           onClick={(event) => event.stopPropagation()}
         >
-          <Tooltip title={item.isActive ? "Đang hoạt động" : "Đã khóa"}>
+          <Tooltip title={activeLabel}>
             <Switch
               size="small"
               checked={item.isActive}

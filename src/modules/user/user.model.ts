@@ -5,7 +5,6 @@ export type { User } from "@/shared/base/entity";
 
 export interface UserQuery extends ApiRequestQuery {
   storeId?: string;
-  roleId?: string;
   isActive?: boolean;
 }
 

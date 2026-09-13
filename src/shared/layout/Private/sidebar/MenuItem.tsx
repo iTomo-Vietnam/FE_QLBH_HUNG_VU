@@ -77,8 +77,8 @@ export const SideBarMenuItems = (): MenuItem[] => {
     <Icon icon="material-symbols:account-balance-wallet-outline" />,
     [
       can("incomeExpense") && item(privateRoutesName.incomeExpense, "Sổ quỹ"),
-      can("fundTransfer") && item(privateRoutesName.fundTransfer, "Chuyển quỹ"),
-      can("fundAdjustment") && item(privateRoutesName.fundAdjustment, "Điều chỉnh số dư"),
+      // can("fundTransfer") && item(privateRoutesName.fundTransfer, "Chuyển quỹ"),
+      // can("fundAdjustment") && item(privateRoutesName.fundAdjustment, "Điều chỉnh số dư"),
       can("debtAdjustment") && item(privateRoutesName.debtAdjustment, "Điều chỉnh công nợ"),
       can("vatAdjustment") && item(privateRoutesName.vatAdjustment, "Điều chỉnh VAT"),
     ].filter(Boolean) as MenuItem[],
