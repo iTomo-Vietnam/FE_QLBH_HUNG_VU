@@ -3,13 +3,14 @@ import { AddButton, Panel, PanelFilter, SearchInput } from "@/shared/components"
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
 import { usePageState } from "@/shared/hooks/usePageState";
 import { SortOrder } from "@/shared/constants/enum";
-import { checkSelection, randomId } from "@/shared/utils/common.util";
+import { checkSelection } from "@/shared/utils/common.util";
 import {
   InternalExport,
   InternalExportType,
   internalExportTypeOptions,
 } from "./internalExport.model";
 import { useInternalExportStore } from "./internalExport.store";
+import { useInternalExportHandlers } from "./internalExport.handlers";
 import { InternalExportDetailModal, InternalExportModal, InternalExportTable } from "./components";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 
@@ -56,40 +57,17 @@ export const InternalExportPage: React.FC = () => {
     },
     pageAction.handleClose,
   );
-  const edit = (record: InternalExport) => {
-    setDefaultData(undefined);
-    setRowData(record);
-    setOpen(true);
-  };
-  const detail = (record: InternalExport) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-  const handleOpenAdd = store.create
-    ? () => {
-        setRowData(undefined);
-        setDefaultData(undefined);
-        setOpen(true);
-      }
-    : undefined;
-  const handleDelete = (record: InternalExport) => store.remove?.(record.id);
-  const handleCopy = (record: InternalExport) => {
-    setOpenDetail(false);
-    setRowData(undefined);
-    setDefaultData({
-      ...record,
-      id: undefined,
-      tempId: randomId(),
-      code: "",
-      lines: (record.lines || []).map((line: any) => ({
-        ...line,
-        id: undefined,
-        tempId: randomId(),
-        internalExportId: undefined,
-      })),
-    } as any);
-    setOpen(true);
-  };
+  const { handleOpenAdd, handleOpenEdit, handleOpenDetail, handleDelete, handleCopy } =
+    useInternalExportHandlers({
+      create: store.create,
+      update: store.update,
+      remove: store.remove,
+      getById: store.getById,
+      setOpen,
+      setOpenDetail,
+      setRowData,
+      setDefaultData,
+    });
 
   return (
     <div className="flex h-full w-full flex-col gap-3">
@@ -130,13 +108,13 @@ export const InternalExportPage: React.FC = () => {
               pagination={store.pagination}
               setPage={setPage}
               setSize={setSize}
-              onEdit={edit}
+              onEdit={handleOpenEdit}
               onDelete={handleDelete}
               onCopy={store.create ? handleCopy : undefined}
-              onViewDetail={detail}
+              onViewDetail={handleOpenDetail}
               onRow={(record: any) => ({
                 onClick: () => {
-                  if (!checkSelection()) detail(record);
+                  if (!checkSelection()) handleOpenDetail(record);
                 },
               })}
             />
@@ -157,7 +135,7 @@ export const InternalExportPage: React.FC = () => {
         open={openDetail}
         data={rowData}
         onClose={() => pageAction.handleClose()}
-        onOpenUpdate={edit}
+        onOpenUpdate={handleOpenEdit}
         onCopy={store.create ? handleCopy : undefined}
       />
     </div>

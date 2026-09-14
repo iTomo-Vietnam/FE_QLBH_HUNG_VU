@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { App, Button } from "antd";
+import { Button } from "antd";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { ButtonFilter } from "@/shared/components/filters";
 import { DateRangeFilter, Panel, SearchInput } from "@/shared/components";
@@ -8,6 +8,7 @@ import { checkSelection } from "@/shared/utils/common.util";
 import { SortOrder } from "@/shared/constants/enum";
 import { IncomeExpense, IncomeExpenseType } from "./incomeExpense.model";
 import { useIncomeExpenseStore } from "./incomeExpense.store";
+import { useIncomeExpenseHandlers } from "./incomeExpense.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import {
   Filter,
@@ -17,7 +18,6 @@ import {
 } from "./components";
 
 export const IncomeExpensePage: React.FC = () => {
-  const { modal } = App.useApp();
   const [filterType, setFilterType] = useState<IncomeExpenseType | undefined>();
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [openType, setOpenType] = useState<IncomeExpenseType>(IncomeExpenseType.INCOME);
@@ -65,57 +65,29 @@ export const IncomeExpensePage: React.FC = () => {
     pageAction.handleClose,
   );
 
-  const handleOpenAdd = store.create
-    ? (type: IncomeExpenseType) => {
-        setRowData(undefined);
-        setOpenType(type);
-        setOpen(true);
-      }
-    : undefined;
-
-  const handleOpenUpdate = store.update
-    ? (record: IncomeExpense) => {
-        setRowData(record);
-        setOpenType(record.type);
-        setOpen(true);
-      }
-    : undefined;
-
-  const handleOpenDetail = (record: IncomeExpense) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-
-  const handleDelete = store.remove
-    ? (record: IncomeExpense) => {
-        modal.confirm({
-          title: "Xóa phiếu thu chi",
-          content: `Bạn có chắc chắn muốn xóa phiếu “${record.code}”?`,
-          okText: "Xóa",
-          okButtonProps: { danger: true },
-          cancelText: "Hủy",
-          onOk: () => store.remove?.(record.id),
-        });
-      }
-    : undefined;
-
-  const handleFilterTypeChange = (value?: string) => {
-    setFilterType(value as IncomeExpenseType | undefined);
-    setCategoryId(undefined);
-    setPage(1);
-  };
-
-  const handleCategoryChange = (value?: string) => {
-    setCategoryId(value);
-    setFilterType(undefined);
-    setPage(1);
-  };
-
-  const handleResetFilters = () => {
-    setFilterType(undefined);
-    setCategoryId(undefined);
-    pageAction.resetFilter();
-  };
+  const {
+    handleOpenAdd,
+    handleOpenUpdate,
+    handleOpenDetail,
+    handleDelete,
+    handleFilterTypeChange,
+    handleCategoryChange,
+    handleResetFilters,
+  } =
+    useIncomeExpenseHandlers({
+      create: store.create,
+      update: store.update,
+      remove: store.remove,
+      getById: store.getById,
+      setOpen,
+      setOpenDetail,
+      setRowData,
+      setOpenType,
+      setFilterType,
+      setCategoryId,
+      setPage,
+      resetFilter: pageAction.resetFilter,
+    });
 
   const isFilterButtonActive = isFilterActive || Boolean(filterType || categoryId);
 

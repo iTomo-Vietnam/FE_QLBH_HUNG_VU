@@ -70,6 +70,10 @@ export const StoreTransferPage: React.FC = () => {
     handleCopy,
     handleCreateAndExport,
     handleUpdateAndExport,
+    handleStatusChange,
+    handleFromStoresChange,
+    handleToStoresChange,
+    handleClearFilter,
   } = useStoreTransferHandlers({
     create: store.create,
     update: store.update,
@@ -83,13 +87,12 @@ export const StoreTransferPage: React.FC = () => {
     setOpenDetail,
     setRowData,
     setDefaultData,
+    setStatusValues,
+    setFromStores,
+    setToStores,
+    setPage,
+    resetFilter: pageAction.resetFilter,
   });
-  const handleClearFilter = () => {
-    pageAction.resetFilter();
-    setStatusValues([]);
-    setFromStores([]);
-    setToStores([]);
-  };
   const storeFilterContent = (
     <div className="space-y-3 px-4 pb-4">
       <div>
@@ -99,10 +102,7 @@ export const StoreTransferPage: React.FC = () => {
           defaultData={fromStores}
           className="w-full"
           placeholder="Chọn kho chuyển đi"
-          onChangeData={(stores) => {
-            setFromStores(stores);
-            setPage(1);
-          }}
+          onChangeData={handleFromStoresChange}
         />
       </div>
       <div>
@@ -112,10 +112,7 @@ export const StoreTransferPage: React.FC = () => {
           defaultData={toStores}
           className="w-full"
           placeholder="Chọn kho nhận"
-          onChangeData={(stores) => {
-            setToStores(stores);
-            setPage(1);
-          }}
+          onChangeData={handleToStoresChange}
         />
       </div>
     </div>
@@ -146,10 +143,7 @@ export const StoreTransferPage: React.FC = () => {
                 label: storeTransferStatusLabels[status],
               })),
               value: statusValues,
-              onChange: (values) => {
-                setStatusValues(values as StoreTransferStatus[]);
-                setPage(1);
-              },
+              onChange: handleStatusChange,
             },
           ]}
           onClearFilter={handleClearFilter}

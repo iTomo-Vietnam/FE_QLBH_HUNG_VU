@@ -21,7 +21,7 @@ export function useOrderHandlers({
   const { currentStore } = useGlobalData();
 
   const handleOpenDetail = (record: Order) => {
-    if (!!getById) {
+    if (getById) {
       getById(record.id, {
         onSuccess: (data) => {
           if (!data) return;

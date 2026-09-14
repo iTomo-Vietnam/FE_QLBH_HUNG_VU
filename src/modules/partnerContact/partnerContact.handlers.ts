@@ -15,7 +15,7 @@ export function usePartnerContactHandlers({
   const [form] = Form.useForm<any>();
 
   const handleOpenDetail = (record: PartnerContact) => {
-    if (!!getById) {
+    if (getById) {
       getById(record.id, {
         onSuccess: (data) => {
           if (!data) return;

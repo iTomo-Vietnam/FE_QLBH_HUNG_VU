@@ -123,6 +123,7 @@ export interface Store extends Entity {
   taxCode: string | null;
   address: Address | null;
   isActive: boolean;
+  workEndTime?: string | null;
 
   userCount: number;
 }

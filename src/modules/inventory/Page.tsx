@@ -2,6 +2,7 @@ import { usePageState } from "@/shared/hooks/usePageState";
 import { useNavigate } from "react-router-dom";
 import { InventoryReport, InventoryTransactionRefType } from "./inventory.model";
 import { useInventoryReportStore } from "./inventory.store";
+import { useInventoryReportHandlers } from "./inventory.handlers";
 import { SearchInput } from "@/shared/components";
 import { DateRangeFilter } from "@/shared/components";
 import { Panel } from "@/shared/components";
@@ -83,10 +84,7 @@ export const InventoryPage: React.FC = () => {
     ...ranger,
   });
 
-  const handleOpenDetailModal = (record: InventoryReport) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
+  const { handleOpenDetail } = useInventoryReportHandlers({ setOpenDetail, setRowData });
 
   return (
     <div className="flex gap-3 w-full h-full">
@@ -132,7 +130,7 @@ export const InventoryPage: React.FC = () => {
               return {
                 onClick: () => {
                   if (record.isSummary || checkSelection()) return;
-                  handleOpenDetailModal(record);
+                  handleOpenDetail(record);
                 },
                 className: rowData?.id === record.id ? "selected-row" : "",
               };

@@ -37,7 +37,13 @@ export const AttributePage: React.FC = () => {
       { page, size, keyword, sortBy, sortOrder, reload, type, showStatistics: true },
       () => pageAction.handleClose(),
     );
-  const { handleOpenAdd, handleOpenEdit, handleOpenDetail, handleDelete } = useAttributeHandlers({
+  const {
+    handleOpenAdd,
+    handleOpenEdit,
+    handleOpenDetail,
+    handleDelete,
+    handleTypeChange,
+  } = useAttributeHandlers({
     getById,
     create,
     update,
@@ -45,13 +51,9 @@ export const AttributePage: React.FC = () => {
     setOpen,
     setOpenDetail,
     setRowData,
+    setType,
+    setPage,
   });
-
-  const handleTypeChange = (nextType: AttributeType) => {
-    setType(nextType);
-    setPage(1);
-  };
-
   return (
     <div className="flex h-full w-full max-w-7xl mx-auto gap-3">
       <AttributeSideBar activeType={type} onTypeChange={handleTypeChange} />

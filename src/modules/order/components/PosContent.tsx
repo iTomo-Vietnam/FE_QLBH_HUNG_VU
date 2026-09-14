@@ -3,8 +3,7 @@ import type { RefObject } from "react";
 
 import type { Product } from "@/modules/product/product.model";
 import { ProductGrid } from "@/modules/product/components";
-import { FundType } from "@/modules/fund/fund.model";
-import type { CachedOrder, PosOrderType } from "@/shared/stores/orderCache.slice";
+import type { CachedOrder, PaymentMode, PosOrderType } from "@/shared/stores/orderCache.slice";
 import { OrderType } from "../order.model";
 import { OrderProductSelect } from "./OrderProductSelect";
 import { OrderLineTable, PosLine } from "./OrderLineTable";
@@ -37,8 +36,9 @@ interface Props {
   updateActive: (values: Partial<CachedOrder>) => void;
   updateLines: (lines: PosLine[]) => void;
   updateExchangeLines: (lines: PosLine[]) => void;
-  updatePayment: (values: Record<string, unknown>) => void;
-  changePaymentMode: (mode: FundType) => void;
+  updatePayment: (values: Record<string, unknown>, index?: number) => void;
+  payments: PosPayment[];
+  changePaymentMode: (mode: PaymentMode) => void;
   onSubmit: (print?: boolean) => void;
   loading: boolean;
 }
@@ -55,6 +55,7 @@ export const PosContent = ({
   returnTotals,
   exchangeTotals,
   payment,
+  payments,
   productLoading,
   products,
   customerSelectRef,
@@ -177,6 +178,7 @@ export const PosContent = ({
         customerSelectRef={customerSelectRef}
         updateActive={updateActive}
         updatePayment={updatePayment}
+        payments={payments}
         changePaymentMode={changePaymentMode}
         onSubmit={onSubmit}
         loading={loading}
@@ -191,6 +193,7 @@ export const PosContent = ({
         customerSelectRef={customerSelectRef}
         updateActive={updateActive}
         updatePayment={updatePayment}
+        payments={payments}
         changePaymentMode={changePaymentMode}
         onSubmit={onSubmit}
         loading={loading}

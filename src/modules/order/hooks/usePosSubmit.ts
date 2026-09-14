@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 
 import type { Sale } from "@/modules/sale";
-import type { CachedOrder, PosOrderType } from "@/shared/stores/orderCache.slice";
+import type { CachedOrder, PaymentMode, PosOrderType } from "@/shared/stores/orderCache.slice";
 import { addNewCache, removeOrderCache } from "@/shared/stores/orderCache.slice";
 import type { PosPayment, PosTotals } from "../components/PosInvoiceInfo";
 import { emptyOrder } from "../pos.utils";
@@ -22,6 +22,8 @@ interface Options {
   returnTotals: PosTotals;
   exchangeTotals: PosTotals;
   payment?: PosPayment;
+  payments: PosPayment[];
+  paymentMode: PaymentMode;
   orderStore: {
     create?: SaveOrder;
     update?: SaveOrder;
@@ -40,6 +42,8 @@ export const usePosSubmit = ({
   returnTotals,
   exchangeTotals,
   payment,
+  payments,
+  paymentMode,
   orderStore,
   printSales,
 }: Options) => {
@@ -78,10 +82,31 @@ export const usePosSubmit = ({
         paymentMode: _paymentMode,
         ...data
       } = activeOrder;
-      const paymentAmount = Math.max(
+      const selectedPaymentAmount = Math.max(
         0,
         Number(payment?.amount ?? Math.abs(totals.totalAmount) ?? 0),
       );
+      const paymentItems = payments
+        .map((item, index) => ({
+          ...(item || {}),
+          amount:
+            paymentMode === "combined"
+              ? Math.max(0, Number(item?.amount || 0))
+              : index === (paymentMode === "bank" ? 1 : 0)
+                ? selectedPaymentAmount
+                : 0,
+          partnerId: activeOrder.partnerId || null,
+          occurredAt: activeOrder.orderAt,
+          description: activeOrder.code
+            ? `Thanh toán hóa đơn ${activeOrder.code}`
+            : "Thanh toán hóa đơn",
+        }))
+        .filter((item) => item.amount > 0)
+        .map(({ fund, ...item }) => ({ ...item, fundId: item.fundId || null }));
+      if (paymentItems.some((item) => !item.fundId)) {
+        message.error("Vui lòng chọn quỹ thanh toán");
+        return;
+      }
       const payload: Partial<Order> = {
         ...(data as Partial<Order>),
         ...(mode === "edit" && sourceId ? { id: sourceId } : { tempId: cacheId }),
@@ -112,18 +137,7 @@ export const usePosSubmit = ({
           type === OrderType.SALE
             ? totals.totalAmount
             : exchangeTotals.totalAmount - returnTotals.totalAmount,
-        incomeExpenses: [
-          {
-            ...(payment || {}),
-            amount: paymentAmount,
-            fundId: payment?.fundId || null,
-            partnerId: activeOrder.partnerId || null,
-            occurredAt: activeOrder.orderAt,
-            description: activeOrder.code
-              ? `Thanh toán hóa đơn ${activeOrder.code}`
-              : "Thanh toán hóa đơn",
-          },
-        ] as any,
+        incomeExpenses: paymentItems as any,
         lines: payloadExchangeLines as any,
         returnLines: (type === OrderType.SALE_RETURN ? payloadReturnLines : []) as any,
       };
@@ -148,6 +162,8 @@ export const usePosSubmit = ({
       message,
       orderStore,
       payment,
+      payments,
+      paymentMode,
       printSales,
       returnLines,
       returnTotals,

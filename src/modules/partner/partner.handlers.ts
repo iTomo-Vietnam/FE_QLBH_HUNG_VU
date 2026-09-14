@@ -1,4 +1,4 @@
-import { App, Form } from "antd";
+import { App } from "antd";
 import { Partner } from "./partner.model";
 import { HandlersInput } from "@/shared/interfaces/common";
 
@@ -12,16 +12,15 @@ export function usePartnerHandlers({
   setRowData,
 }: HandlersInput<Partner>) {
   const { modal } = App.useApp();
-  const [form] = Form.useForm<any>();
-
   const handleOpenDetail = (record: Partner) => {
     const open = (data?: Partner | null) => {
       if (!data) return;
       setRowData(data);
-      setOpenDetail ? setOpenDetail(true) : setOpen?.(true);
+      if (setOpenDetail) setOpenDetail(true);
+      else setOpen?.(true);
     };
 
-    if (!!getById) {
+    if (getById) {
       getById(record.id, { onSuccess: open });
     } else open(record);
   };

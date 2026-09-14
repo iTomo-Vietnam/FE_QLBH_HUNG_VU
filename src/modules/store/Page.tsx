@@ -1,14 +1,13 @@
 import { AddButton } from "@/shared/components";
 import { SortOrder } from "@/shared/constants/enum";
 import { useStoreStore } from "./store.store";
-import { App } from "antd";
 import { usePageState } from "@/shared/hooks/usePageState";
 import { Store } from "@/shared/base/entity";
 import { StoreAddUpdateModal, StoreList } from "./components";
 import { useAuth } from "@/shared/hooks/useAuth";
+import { useStoreHandlers } from "./store.handlers";
 
 export const StorePage: React.FC = () => {
-  const { modal } = App.useApp();
   const {
     filter,
     reload,
@@ -22,7 +21,7 @@ export const StorePage: React.FC = () => {
   } = usePageState<Store>();
   const { getInfo } = useAuth();
 
-  const { data, errors, loading, creating, updating, pagination, create, update, remove } =
+  const { data, errors, loading, creating, updating, pagination, create, update, remove, getById } =
     useStoreStore(
       {
         page: 1,
@@ -38,34 +37,13 @@ export const StorePage: React.FC = () => {
       },
     );
 
-  const handleOpenAddModal = create
-    ? () => {
-        setOpen(true);
-        setRowData(undefined);
-      }
-    : undefined;
-
-  const handleOpenUpdate = update
-    ? (record: Store) => {
-        setOpen(true);
-        setRowData(record);
-      }
-    : undefined;
-
-  const handleDelete = remove
-    ? (record: Store) => {
-        modal.confirm({
-          centered: true,
-          title: "Xóa cửa hàng",
-          content: `Bạn có chắc chắn muốn xóa cửa hàng "${record.name}"?`,
-          okText: "Xóa",
-          cancelText: "Hủy",
-          onOk: () => {
-            remove(record.id);
-          },
-        });
-      }
-    : undefined;
+  const { handleOpenAdd, handleOpenUpdate, handleDelete } = useStoreHandlers({
+    update,
+    remove,
+    getById,
+    setOpen,
+    setRowData,
+  });
 
   return (
     <div className="flex flex-col h-full w-full gap-6 sm:gap-10 lg:gap-16 py-3 px-3 sm:px-4 lg:px-6">
@@ -85,7 +63,7 @@ export const StorePage: React.FC = () => {
             khác liên quan đến cửa hàng.
           </p>
         </div>
-        <AddButton onOpenAdd={handleOpenAddModal} />
+        <AddButton onOpenAdd={create ? handleOpenAdd : undefined} />
       </div>
 
       <StoreList

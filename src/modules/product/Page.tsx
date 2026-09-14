@@ -5,7 +5,7 @@ import { PanelFilter } from "@/shared/components/filters";
 import { DateRangeFilter } from "@/shared/components";
 import { AddButton } from "@/shared/components";
 import { Panel } from "@/shared/components";
-import { App, Dropdown, Tabs, Table, Button } from "antd";
+import { Dropdown, Tabs, Table, Button } from "antd";
 import { CustomPagination } from "@/shared/components";
 import { formatMoney, formatQuantity } from "@/shared/utils/number.util";
 import dayjs from "dayjs";
@@ -36,7 +36,6 @@ import {
 import { useGlobalData } from "@/shared/hooks";
 
 export const ProductPage: React.FC = () => {
-  const { modal } = App.useApp();
   const { currentStore } = useGlobalData();
   const {
     isFilterActive,
@@ -89,67 +88,37 @@ export const ProductPage: React.FC = () => {
     () => pageAction.handleClose(),
   );
 
-  const { handleOpenAdd, handleOpenEdit, handleOpenDetail, handleDelete, handleEditFromDetail } =
-    useProductHandlers({ getById, create, update, remove, setOpen, setOpenDetail, setRowData });
+  const {
+    handleOpenAdd,
+    handleOpenEdit,
+    handleOpenDetail,
+    handleDelete,
+    handleEditFromDetail,
+    handleChangeGroup,
+    handleSubmitChangeGroup,
+    handleStopSelling,
+    handleDeleteSelected,
+    handlePrintSelected,
+  } = useProductHandlers({
+    getById,
+    create,
+    update,
+    remove,
+    removeMany,
+    changeGroup,
+    stopSelling,
+    selectedProducts,
+    currentStoreId: currentStore?.id,
+    currentStoreName: currentStore?.name,
+    setSelectedProducts,
+    setOpenChangeGroup,
+    setOpenPrintLabels,
+    setOpen,
+    setOpenDetail,
+    setRowData,
+  });
 
   const selectedProductIds = selectedProducts.map((product) => product.id);
-  const clearSelectedProducts = () => setSelectedProducts([]);
-
-  const handleChangeGroup = () => {
-    if (changeGroup) setOpenChangeGroup(true);
-  };
-
-  const handleSubmitChangeGroup = (groupId: string | null) => {
-    changeGroup?.(selectedProductIds, groupId, {
-      onSuccess: () => {
-        setOpenChangeGroup(false);
-        clearSelectedProducts();
-      },
-    });
-  };
-
-  const handleStopSelling = () => {
-    if (!stopSelling) return;
-    const storeName = currentStore?.name;
-    modal.confirm({
-      centered: true,
-      title: "Ngừng kinh doanh",
-      content: storeName
-        ? `Bạn có chắc muốn ngừng kinh doanh ${selectedProducts.length} sản phẩm tại cửa hàng "${storeName}"?`
-        : `Bạn có chắc muốn ngừng kinh doanh ${selectedProducts.length} sản phẩm tại tất cả cửa hàng?`,
-      okText: "Ngừng kinh doanh",
-      okButtonProps: { danger: true },
-      cancelText: "Hủy",
-      onOk: () =>
-        stopSelling(selectedProductIds, currentStore?.id, {
-          onSuccess: clearSelectedProducts,
-        }),
-    });
-  };
-
-  const handleDeleteSelected = () => {
-    if (!removeMany) return;
-    modal.confirm({
-      centered: true,
-      title: "Xóa hàng hóa",
-      content: `Bạn có chắc muốn xóa ${selectedProducts.length} hàng hóa đã chọn?`,
-      okText: "Xóa",
-      okButtonProps: { danger: true },
-      cancelText: "Hủy",
-      onOk: () => removeMany(selectedProductIds, { onSuccess: clearSelectedProducts }),
-    });
-  };
-
-  const handlePrintSelected = () => {
-    if (!selectedProducts.some((product) => product.barcode?.trim())) {
-      modal.warning({
-        title: "Không thể in tem",
-        content: "Các sản phẩm đã chọn không có mã vạch.",
-      });
-      return;
-    }
-    setOpenPrintLabels(true);
-  };
 
   const selectedDestructiveItems = [
     stopSelling && {

@@ -5,6 +5,7 @@ import { SortOrder } from "@/shared/constants";
 import { useOperationLogStore } from "./operationLog.store";
 import { DateRangeFilter, Panel, SearchInput } from "@/shared/components";
 import { OperationLogTable } from "./components";
+import { useOperationLogHandlers } from "./operationLog.handlers";
 import LogDetailDrawer from "./components/LogDetailDrawer";
 
 export const OperationLogPage: React.FC = () => {
@@ -64,10 +65,7 @@ export const OperationLogPage: React.FC = () => {
     label,
   }));
 
-  const handleViewDetail = (log: OperationLog) => {
-    setRowData(log);
-    setOpenDetail(true);
-  };
+  const { handleViewDetail } = useOperationLogHandlers({ setOpenDetail, setRowData });
 
   return (
     <div className="flex flex-col h-full w-full max-w-6xl mx-auto gap-3">

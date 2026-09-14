@@ -4,6 +4,7 @@ import { Order } from "@/modules/order";
 
 export type PosOrderType = "sale" | "sale_return";
 export type PosCacheMode = "create" | "edit";
+export type PaymentMode = "cash" | "bank" | "combined";
 
 export interface CachedOrder {
   id: string;
@@ -32,7 +33,7 @@ export interface CachedOrder {
     [key: string]: unknown;
   }>;
   /** UI-only payment mode used before a bank fund is selected. */
-  paymentMode?: "cash" | "bank";
+  paymentMode?: PaymentMode;
   discountType?: "amount" | "percent";
   discountValue?: number;
   taxType?: "amount" | "percent";
@@ -93,6 +94,10 @@ const createNewCache = (
   const mode = payload.mode || "create";
   const order = payload.order || {};
   const { initialOrder: _initialOrder, ...orderData } = order;
+  const sourcePayments = order.incomeExpenses || [];
+  const firstIsBank = (sourcePayments[0] as any)?.fund?.type === "bank";
+  const cashPayment = firstIsBank ? sourcePayments[1] : sourcePayments[0];
+  const bankPayment = firstIsBank ? sourcePayments[0] : sourcePayments[1];
 
   const cache: CachedOrder = {
     ...orderData,
@@ -105,6 +110,11 @@ const createNewCache = (
     label: makeLabel(state, payload.type, mode, order.code),
     lines: order.lines || [],
     returnLines: order.returnLines || [],
+    incomeExpenses: [
+      { ...(cashPayment || {}), amount: Number(cashPayment?.amount || 0) },
+      { ...(bankPayment || {}), amount: Number(bankPayment?.amount || 0) },
+    ],
+    paymentMode: order.paymentMode || (firstIsBank ? "bank" : "cash"),
     discountType: order.discountType || "amount",
     discountValue: order.discountValue ?? 0,
     taxType: order.taxType || "percent",

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { Form, FormProps, Input, Modal } from "antd";
+import { Form, FormProps, Input, Modal, TimePicker } from "antd";
+import dayjs from "dayjs";
 import { Store } from "@/shared/base/entity";
 import { SubmitButton } from "@/shared/components";
 import {
@@ -36,6 +37,7 @@ export const StoreAddUpdateModal: React.FC<AddUpdateModalProps<Store>> = ({
   const onFinish: FormProps<Store>["onFinish"] = async (values: Store) => {
     const formattedData = {
       ...values,
+      workEndTime: (values as any).workEndTime?.format("HH:mm") || null,
       id,
       tempId: id,
     };
@@ -69,8 +71,10 @@ export const StoreAddUpdateModal: React.FC<AddUpdateModalProps<Store>> = ({
         if (!editData) {
           return;
         }
-        form;
-        const formattedData = parseFormDataDates(editData);
+        const formattedData = {
+          ...parseFormDataDates(editData),
+          workEndTime: editData.workEndTime ? dayjs(`2000-01-01T${editData.workEndTime}`) : null,
+        };
         form.setFieldsValue(formattedData);
       }}
       destroyOnClose
@@ -166,6 +170,14 @@ export const StoreAddUpdateModal: React.FC<AddUpdateModalProps<Store>> = ({
           </Form.Item>
           <Form.Item name="taxCode" label={<Label title="Mã số thuế" />}>
             <Input placeholder="Nhập mã số thuế" />
+          </Form.Item>
+
+          <Form.Item
+            name="workEndTime"
+            label={<Label title="Giờ kết thúc làm việc" />}
+            extra="Sau giờ này 1 tiếng, các phiếu nháp chưa hoàn thành sẽ được tự động hủy."
+          >
+            <TimePicker format="HH:mm" minuteStep={5} className="w-full" placeholder="Chọn giờ kết thúc" />
           </Form.Item>
 
           <Form.Item name="note" label={<Label title="Ghi chú" />}>

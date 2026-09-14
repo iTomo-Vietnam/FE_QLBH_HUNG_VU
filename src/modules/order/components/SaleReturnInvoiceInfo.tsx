@@ -1,5 +1,5 @@
 import { ExportOutlined, PrinterOutlined } from "@ant-design/icons";
-import { Button, Modal, Segmented } from "antd";
+import { Button, Form, Modal, Segmented } from "antd";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { CustomerAddSelect } from "@/modules/partner/components/Select";
@@ -9,7 +9,7 @@ import { FundSelect } from "@/modules/fund/components/Select";
 import { FundType } from "@/modules/fund/fund.model";
 import { OrderValueInput, InputMoney } from "@/shared/components";
 import { DiscountType } from "@/shared/constants/enum";
-import { CachedOrder } from "@/shared/stores/orderCache.slice";
+import { CachedOrder, PaymentMode } from "@/shared/stores/orderCache.slice";
 import { bank_bin_map } from "@/shared/constants/option/bank";
 import { formatMoney, getCashSuggestions } from "@/shared/utils/number.util";
 import { QrPay } from "@/shared/utils/qrcode";
@@ -23,8 +23,9 @@ interface Props {
   payment?: PosPayment;
   customerSelectRef: React.RefObject<HTMLDivElement>;
   updateActive: (values: Partial<CachedOrder>) => void;
-  updatePayment: (values: Record<string, unknown>) => void;
-  changePaymentMode: (mode: FundType) => void;
+  updatePayment: (values: Record<string, unknown>, index?: number) => void;
+  payments: PosPayment[];
+  changePaymentMode: (mode: PaymentMode) => void;
   onSubmit: (print?: boolean) => void;
   loading?: boolean;
   readOnly?: boolean;
@@ -55,6 +56,7 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
   returnTotals,
   exchangeTotals,
   payment,
+  payments,
   customerSelectRef,
   updateActive,
   updatePayment,
@@ -65,9 +67,14 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
 }) => {
   const settlementAmount = exchangeTotals.totalAmount - returnTotals.totalAmount;
   const paymentDue = Math.abs(settlementAmount);
-  const paidAmount = Number(payment?.amount || 0);
   const paymentMode = (activeOrder.paymentMode ||
-    (payment?.fund?.type === FundType.BANK ? FundType.BANK : FundType.CASH)) as FundType;
+    (payment?.fund?.type === FundType.BANK ? FundType.BANK : FundType.CASH)) as PaymentMode;
+  const cashPayment = payments[0] || {};
+  const bankPayment = payments[1] || {};
+  const paidAmount =
+    paymentMode === "combined"
+      ? payments.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+      : Number(payment?.amount || 0);
   const returnLines = useMemo(() => activeOrder.returnLines || [], [activeOrder.returnLines]);
   const exchangeLines = activeOrder.lines || [];
   const hasExchange = exchangeLines.some((line) => Number((line as any).quantity || 0) > 0);
@@ -108,11 +115,16 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
   const customer = activeOrder.partner as Partner | undefined;
   const sourceCode = activeOrder.refOrder?.code || activeOrder.code || "Trả nhanh";
   const isCustomerPaying = settlementAmount > 0;
-  const bankFund = paymentMode === FundType.BANK ? payment?.fund : undefined;
+  const bankFund = bankPayment.fund;
 
   useEffect(() => {
     const bin = bank_bin_map[bankFund?.bank || ""];
-    if (!bankFund?.accountNumber || !paymentDue || !bin || paymentMode !== FundType.BANK) {
+    if (
+      !bankFund?.accountNumber ||
+      !paymentDue ||
+      !bin ||
+      (paymentMode !== FundType.BANK && paymentMode !== "combined")
+    ) {
       setQrImage(undefined);
       return;
     }
@@ -277,18 +289,43 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
         />
         {paymentDue > 0 && (
           <>
-            <div className="flex items-center justify-between gap-3 py-2 text-sm">
-              <span>{isCustomerPaying ? "Khách thanh toán" : "Hoàn tiền khách"}</span>
-              <div className="w-56">
-                <InputMoney
-                  min={0}
-                  value={paidAmount}
-                  disabled={readOnly}
-                  onChange={(amount) => updatePayment({ amount: Number(amount || 0) })}
-                  className="w-56"
-                />
+            {paymentMode !== "combined" ? (
+              <div className="flex items-center justify-between gap-3 py-2 text-sm">
+                <span>{isCustomerPaying ? "Khách thanh toán" : "Hoàn tiền khách"}</span>
+                <div className="w-56">
+                  <InputMoney
+                    min={0}
+                    value={paidAmount}
+                    disabled={readOnly}
+                    onChange={(amount) => updatePayment({ amount: Number(amount || 0) })}
+                    className="w-56"
+                  />
+                </div>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between gap-3 py-2 text-sm">
+                  <span>Tiền mặt</span>
+                  <InputMoney
+                    min={0}
+                    value={Number(cashPayment.amount || 0)}
+                    disabled={readOnly}
+                    onChange={(amount) => updatePayment({ amount: Number(amount || 0) }, 0)}
+                    className="w-56"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 py-2 text-sm">
+                  <span>{bankFund?.name || "Chuyển khoản"}</span>
+                  <InputMoney
+                    min={0}
+                    value={Number(bankPayment.amount || 0)}
+                    disabled={readOnly}
+                    onChange={(amount) => updatePayment({ amount: Number(amount || 0) }, 1)}
+                    className="w-56"
+                  />
+                </div>
+              </>
+            )}
             {!readOnly && (
               <>
                 <Segmented
@@ -297,32 +334,33 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
                   options={[
                     { label: "Tiền mặt", value: FundType.CASH },
                     { label: "Chuyển khoản", value: FundType.BANK },
+                    { label: "Kết hợp", value: "combined" },
                   ]}
-                  onChange={(value) => changePaymentMode(value as FundType)}
+                  onChange={(value) => changePaymentMode(value as PaymentMode)}
                 />
                 <div className="hidden">
                   <FundListSelect
-                    query={{ type: paymentMode }}
-                    value={payment?.fundId || undefined}
-                    defaultData={payment?.fund}
-                    onChangeData={(fund) => updatePayment({ fundId: fund?.id || null, fund })}
+                    query={{ type: FundType.CASH }}
+                    value={cashPayment.fundId || undefined}
+                    defaultData={cashPayment.fund}
+                    onChangeData={(fund) => updatePayment({ fundId: fund?.id || null, fund }, 0)}
                   />
                 </div>
-                {paymentMode === FundType.CASH && (
+                {(paymentMode === FundType.CASH || paymentMode === "combined") && (
                   <div className="mt-3 flex flex-wrap gap-1.5 rounded-md bg-gray-100 p-3">
                     {cashAmountOptions.map((amount) => (
                       <Button
                         key={amount}
                         className="rounded-full"
-                        type={paidAmount === amount ? "primary" : "default"}
-                        onClick={() => updatePayment({ amount })}
+                        type={Number(cashPayment.amount || 0) === amount ? "primary" : "default"}
+                        onClick={() => updatePayment({ amount }, 0)}
                       >
                         {formatMoney(amount)}
                       </Button>
                     ))}
                   </div>
                 )}
-                {paymentMode === FundType.BANK && (
+                {(paymentMode === FundType.BANK || paymentMode === "combined") && (
                   <div className="mt-2 flex gap-3 rounded-md bg-gray-100 p-2">
                     {qrImage && (
                       <img
@@ -332,12 +370,14 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
                       />
                     )}
                     <div className="flex flex-1 flex-col gap-3">
-                      <FundSelect
-                        query={{ type: FundType.BANK }}
-                        value={payment?.fundId || undefined}
-                        defaultData={payment?.fund}
-                        onChangeData={(fund) => updatePayment({ fundId: fund?.id || null, fund })}
-                      />
+                      <Form.Item label="Tài khoản" className="mb-0">
+                        <FundSelect
+                          query={{ type: FundType.BANK }}
+                          value={bankPayment.fundId || undefined}
+                          defaultData={bankPayment.fund}
+                          onChangeData={(fund) => updatePayment({ fundId: fund?.id || null, fund }, 1)}
+                        />
+                      </Form.Item>
                       <div className="flex items-center justify-between">
                         <Button
                           size="small"
@@ -351,7 +391,7 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
                         <button
                           type="button"
                           className="w-fit font-semibold text-slate-500 transition-all ease-in-out hover:text-primary"
-                          onClick={() => updatePayment({ amount: paymentDue })}
+                          onClick={() => updatePayment({ amount: paymentDue }, 1)}
                         >
                           {isCustomerPaying ? "Thanh toán toàn bộ" : "Hoàn tiền toàn bộ"}
                         </button>

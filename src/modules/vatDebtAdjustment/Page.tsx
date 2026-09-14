@@ -1,11 +1,11 @@
 import React from "react";
-import { App } from "antd";
 import { AddButton, Panel, PanelFilter, SearchInput } from "@/shared/components";
 import { usePageState } from "@/shared/hooks/usePageState";
 import { checkSelection } from "@/shared/utils/common.util";
 import { SortOrder } from "@/shared/constants/enum";
 import { VatDebtAdjustment } from "./vatDebtAdjustment.model";
 import { useVatDebtAdjustmentStore } from "./vatDebtAdjustment.store";
+import { useVatDebtAdjustmentHandlers } from "./vatDebtAdjustment.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import {
   VatDebtAdjustmentAddUpdateModal,
@@ -14,7 +14,6 @@ import {
 } from "./components";
 
 const VatDebtAdjustmentPage: React.FC = () => {
-  const { modal } = App.useApp();
   const {
     isFilterActive,
     keyword,
@@ -44,31 +43,15 @@ const VatDebtAdjustmentPage: React.FC = () => {
     pageAction.handleClose,
   );
 
-  const handleOpenAdd = () => {
-    setRowData(undefined);
-    setOpen(true);
-  };
-  const handleEdit = store.update
-    ? (record: VatDebtAdjustment) => {
-        setRowData(record);
-        setOpen(true);
-      }
-    : undefined;
-  const handleDetail = (record: VatDebtAdjustment) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-  const handleDelete = store.remove
-    ? (record: VatDebtAdjustment) =>
-        modal.confirm({
-          title: "Xóa phiếu điều chỉnh VAT",
-          content: `Bạn có chắc chắn muốn xóa phiếu “${record.code}”?`,
-          okText: "Xóa",
-          okButtonProps: { danger: true },
-          cancelText: "Hủy",
-          onOk: () => store.remove?.(record.id),
-        })
-    : undefined;
+  const { handleOpenAdd, handleEdit, handleDetail, handleDelete } =
+    useVatDebtAdjustmentHandlers({
+      update: store.update,
+      remove: store.remove,
+      getById: store.getById,
+      setOpen,
+      setOpenDetail,
+      setRowData,
+    });
 
   return (
     <div className="flex h-full w-full gap-3">

@@ -7,6 +7,7 @@ import {
   canImportStoreTransfer,
 } from "./storeTransfer.model";
 import { randomId } from "@/shared/utils/common.util";
+import { Store } from "@/shared/base/entity";
 
 type StoreTransferMutation = (
   data: Partial<StoreTransfer>,
@@ -29,6 +30,11 @@ interface StoreTransferHandlersInput {
   setOpenDetail: (open: boolean) => void;
   setRowData: (data: StoreTransfer | undefined) => void;
   setDefaultData: (data: Partial<StoreTransfer> | undefined) => void;
+  setStatusValues?: (values: StoreTransfer["status"][]) => void;
+  setFromStores?: (stores: Store[]) => void;
+  setToStores?: (stores: Store[]) => void;
+  setPage?: (page: number) => void;
+  resetFilter?: () => void;
 }
 
 export function useStoreTransferHandlers({
@@ -44,6 +50,11 @@ export function useStoreTransferHandlers({
   setOpenDetail,
   setRowData,
   setDefaultData,
+  setStatusValues,
+  setFromStores,
+  setToStores,
+  setPage,
+  resetFilter,
 }: StoreTransferHandlersInput) {
   const { modal } = App.useApp();
 
@@ -173,6 +184,34 @@ export function useStoreTransferHandlers({
       }
     : undefined;
 
+  const handleStatusChange = (values: string[]) => {
+    setStatusValues?.(values as StoreTransfer["status"][]);
+    setPage?.(1);
+  };
+
+  const handleFromStoresChange = setFromStores
+    ? (stores: Store[]) => {
+        setFromStores(stores);
+        setPage?.(1);
+      }
+    : undefined;
+
+  const handleToStoresChange = setToStores
+    ? (stores: Store[]) => {
+        setToStores(stores);
+        setPage?.(1);
+      }
+    : undefined;
+
+  const handleClearFilter = resetFilter
+    ? () => {
+        resetFilter();
+        setStatusValues?.([]);
+        setFromStores?.([]);
+        setToStores?.([]);
+      }
+    : undefined;
+
   return {
     handleOpenAdd,
     handleOpenEdit,
@@ -184,5 +223,9 @@ export function useStoreTransferHandlers({
     handleCopy,
     handleCreateAndExport,
     handleUpdateAndExport,
+    handleStatusChange,
+    handleFromStoresChange,
+    handleToStoresChange,
+    handleClearFilter,
   } as const;
 }

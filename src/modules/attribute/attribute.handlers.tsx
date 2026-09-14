@@ -1,6 +1,7 @@
 import { App } from "antd";
 import { Attribute } from "./attribute.model";
 import { HandlersInput } from "@/shared/interfaces/common";
+import { AttributeType } from "./attribute.enum";
 
 export function useAttributeHandlers({
   create,
@@ -10,8 +11,18 @@ export function useAttributeHandlers({
   setOpen,
   setOpenDetail,
   setRowData,
-}: HandlersInput<Attribute>) {
+  setType,
+  setPage,
+}: HandlersInput<Attribute> & {
+  setType?: (type: AttributeType) => void;
+  setPage?: (page: number) => void;
+}) {
   const { modal } = App.useApp();
+  const handleTypeChange = (nextType: AttributeType) => {
+    setType?.(nextType);
+    setPage?.(1);
+  };
+
   return {
     handleOpenDetail: (r: Attribute) => {
       if (getById)
@@ -66,5 +77,6 @@ export function useAttributeHandlers({
           setOpen?.(true);
         }
       : undefined,
+    handleTypeChange,
   };
 }

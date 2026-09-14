@@ -1,6 +1,7 @@
 import { usePageState } from "@/shared/hooks/usePageState";
 import { PartnerDebtReport, PartnerDebtRefType } from "./partnerDebtReport.model";
 import { usePartnerDebtReportStore } from "./partnerDebtReport.store";
+import { usePartnerDebtReportHandlers } from "./partnerDebtReport.handlers";
 import { SearchInput } from "@/shared/components";
 import { DateRangeFilter } from "@/shared/components";
 import { Panel } from "@/shared/components";
@@ -83,16 +84,13 @@ export const PartnerDebtReportPage: React.FC = () => {
     ...(storeIds.length ? { storeIds } : {}),
   });
 
-  const handleOpenDetailModal = (record: PartnerDebtReport) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-
-  const handleSideChange = (key: string) => {
-    setSide(key as DebtSide);
-    setPageReport(1);
-    pageAction.handleSearch("");
-  };
+  const { handleOpenDetail, handleSideChange } = usePartnerDebtReportHandlers({
+    setOpenDetail,
+    setRowData,
+    setSide,
+    setPage: setPageReport,
+    resetSearch: pageAction.handleSearch,
+  });
 
   return (
     <div className="flex flex-col h-full w-full gap-1">
@@ -143,7 +141,7 @@ export const PartnerDebtReportPage: React.FC = () => {
             return {
               onClick: () => {
                 if (record.isSummary || checkSelection()) return;
-                handleOpenDetailModal(record);
+                handleOpenDetail(record);
               },
               className: rowData?.id === record.id ? "selected-row" : "",
             };

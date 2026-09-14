@@ -1,5 +1,5 @@
 import React from "react";
-import { App, Button } from "antd";
+import { Button } from "antd";
 import { DateRangeFilter, Panel, SearchInput } from "@/shared/components";
 import { ButtonFilter } from "@/shared/components/filters";
 import { usePageState } from "@/shared/hooks/usePageState";
@@ -7,6 +7,7 @@ import { checkSelection } from "@/shared/utils/common.util";
 import { DebtSide, SortOrder } from "@/shared/constants/enum";
 import { DebtAdjustment } from "./debtAdjustment.model";
 import { useDebtAdjustmentStore } from "./debtAdjustment.store";
+import { useDebtAdjustmentHandlers } from "./debtAdjustment.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import {
   DebtAdjustmentAddUpdateModal,
@@ -17,7 +18,6 @@ import {
 } from "./components";
 
 export const DebtAdjustmentPage: React.FC = () => {
-  const { modal } = App.useApp();
   const [filterSide, setFilterSide] = React.useState<DebtSide | undefined>();
   const [partnerGroupId, setPartnerGroupId] = React.useState<string | undefined>();
   const [openSide, setOpenSide] = React.useState<DebtSide>(DebtSide.RECEIVABLE);
@@ -64,48 +64,26 @@ export const DebtAdjustmentPage: React.FC = () => {
     },
     pageAction.handleClose,
   );
-
-  const handleOpenAdd = (side: DebtSide) => {
-    setRowData(undefined);
-    setOpenSide(side);
-    setOpen(true);
-  };
-  const handleEdit = store.update
-    ? (record: DebtAdjustment) => {
-        setRowData(record);
-        setOpenSide(record.side);
-        setOpen(true);
-      }
-    : undefined;
-  const handleDetail = (record: DebtAdjustment) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-  const handleSelectSide = (side: DebtSide) => {
-    setFilterSide(side);
-    setPartnerGroupId(undefined);
-    setPage(1);
-  };
-  const handleSelectGroup = (side: DebtSide, groupId: string) => {
-    setFilterSide(side);
-    setPartnerGroupId(groupId);
-    setPage(1);
-  };
-  const handleResetFilters = () => {
-    setFilterSide(undefined);
-    setPartnerGroupId(undefined);
-  };
-  const handleDelete = store.remove
-    ? (record: DebtAdjustment) =>
-        modal.confirm({
-          title: "Xóa phiếu điều chỉnh công nợ",
-          content: `Bạn có chắc chắn muốn xóa phiếu “${record.code}”?`,
-          okText: "Xóa",
-          okButtonProps: { danger: true },
-          cancelText: "Hủy",
-          onOk: () => store.remove?.(record.id),
-        })
-    : undefined;
+  const {
+    handleOpenAdd,
+    handleEdit,
+    handleDetail,
+    handleDelete,
+    handleSelectSide,
+    handleSelectGroup,
+    handleResetFilters,
+  } = useDebtAdjustmentHandlers({
+    update: store.update,
+    remove: store.remove,
+    getById: store.getById,
+    setOpen,
+    setOpenDetail,
+    setRowData,
+    setOpenSide,
+    setFilterSide,
+    setPartnerGroupId,
+    setPage,
+  });
 
   return (
     <div className="flex h-full w-full gap-3">

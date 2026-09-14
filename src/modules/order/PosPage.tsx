@@ -19,6 +19,8 @@ import {
   getAllocatedReturnValue,
   getLinesGrossAmount,
   hasCacheChanges,
+  getPaymentIndex,
+  getPaymentSlots,
 } from "./pos.utils";
 import { usePosLineActions } from "./hooks/usePosLineActions";
 import { usePosProductActions } from "./hooks/usePosProductActions";
@@ -27,6 +29,7 @@ import { usePosReturnSource } from "./hooks/usePosReturnSource";
 import {
   addNewCache,
   CachedOrder,
+  PaymentMode,
   PosOrderType,
   removeOrderCache,
   setCurrentOrderCache,
@@ -374,30 +377,21 @@ export const PosPage: React.FC = () => {
     onError: (text) => message.error(text),
   });
 
-  const payment = activeOrder?.incomeExpenses?.[0] as PosPayment | undefined;
+  const payments = getPaymentSlots(activeOrder) as PosPayment[];
+  const paymentMode = (activeOrder?.paymentMode || "cash") as PaymentMode;
+  const payment = payments[getPaymentIndex(paymentMode)] as PosPayment | undefined;
 
-  const updatePayment = (values: Record<string, unknown>) => {
+  const updatePayment = (values: Record<string, unknown>, index = getPaymentIndex(paymentMode)) => {
+    const nextPayments = getPaymentSlots(activeOrder);
     updateActive({
-      incomeExpenses: [
-        {
-          ...(payment || {}),
-          ...values,
-        },
-      ],
+      incomeExpenses: nextPayments.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, ...values } : item,
+      ),
     });
   };
 
-  const changePaymentMode = (mode: FundType) => {
-    updateActive({
-      paymentMode: mode,
-      incomeExpenses: [
-        {
-          ...(payment || {}),
-          fundId: null,
-          fund: null,
-        },
-      ],
-    });
+  const changePaymentMode = (mode: PaymentMode) => {
+    updateActive({ paymentMode: mode });
   };
 
   const submit = usePosSubmit({
@@ -411,6 +405,8 @@ export const PosPage: React.FC = () => {
     returnTotals,
     exchangeTotals,
     payment,
+    payments,
+    paymentMode,
     orderStore,
     printSales,
   });
@@ -538,6 +534,7 @@ export const PosPage: React.FC = () => {
             returnTotals={returnTotals}
             exchangeTotals={exchangeTotals}
             payment={payment}
+            payments={payments}
             productLoading={productStore.loading}
             products={filteredProducts}
             customerSelectRef={customerSelectRef}

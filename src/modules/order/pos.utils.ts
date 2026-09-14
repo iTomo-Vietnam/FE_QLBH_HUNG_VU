@@ -3,7 +3,9 @@ import { FundType } from "@/modules/fund/fund.model";
 import type { Product } from "@/modules/product/product.model";
 import type { PosLine } from "./components/OrderLineTable";
 import { OrderType } from "./order.model";
-import type { CachedOrder, PosOrderType } from "@/shared/stores/orderCache.slice";
+import type { CachedOrder, PaymentMode, PosOrderType } from "@/shared/stores/orderCache.slice";
+
+export type { PaymentMode };
 
 export const emptyOrder = (type: PosOrderType): Partial<CachedOrder> => ({
   type,
@@ -21,8 +23,18 @@ export const emptyOrder = (type: PosOrderType): Partial<CachedOrder> => ({
   shippingFee: 0,
   isFreeShipping: false,
   paymentMode: FundType.CASH,
-  incomeExpenses: [{ amount: 0, fundId: null, fund: null }],
+  incomeExpenses: [
+    { amount: 0, fundId: null, fund: null },
+    { amount: 0, fundId: null, fund: null },
+  ],
 });
+
+export const getPaymentSlots = (order?: Partial<CachedOrder>) => [
+  { ...((order?.incomeExpenses?.[0] || {}) as Record<string, unknown>), amount: Number(order?.incomeExpenses?.[0]?.amount || 0) },
+  { ...((order?.incomeExpenses?.[1] || {}) as Record<string, unknown>), amount: Number(order?.incomeExpenses?.[1]?.amount || 0) },
+];
+
+export const getPaymentIndex = (mode: PaymentMode): number => (mode === "bank" ? 1 : 0);
 
 const CACHE_META_FIELDS = new Set(["id", "tempId", "label", "mode", "sourceId", "initialOrder"]);
 

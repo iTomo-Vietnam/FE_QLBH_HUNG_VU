@@ -4,8 +4,8 @@ import { useGlobalData } from "@/shared/hooks/useGlobalData";
 import { AddButton, Panel, PanelFilter, SearchInput } from "@/shared/components";
 import { useInventoryAdjustmentStore } from "./inventoryAdjustment.store";
 import { InventoryAdjustment } from "./inventoryAdjustment.model";
-import { randomId } from "@/shared/utils/common.util";
 import { SortOrder } from "@/shared/constants/enum";
+import { useInventoryAdjustmentHandlers } from "./inventoryAdjustment.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import {
   InventoryAdjustmentTable,
@@ -37,7 +37,7 @@ const InventoryAdjustmentPage: React.FC = () => {
   const [openDetail, setOpenDetail] = useState(false);
   const [rowData, setRowData] = useState<InventoryAdjustment>();
   const [defaultData, setDefaultData] = useState<Partial<InventoryAdjustment>>();
-  const { data, loading, pagination, create, update, remove } = useInventoryAdjustmentStore(
+  const { data, loading, pagination, create, update, remove, getById } = useInventoryAdjustmentStore(
     {
       keyword,
       page,
@@ -53,46 +53,23 @@ const InventoryAdjustmentPage: React.FC = () => {
       setOpenDetail(false);
     },
   );
-  const handleCopy = (record: InventoryAdjustment) => {
-    setOpenDetail(false);
-    setRowData(undefined);
-    setDefaultData({
-      ...record,
-      id: undefined,
-      tempId: randomId(),
-      code: "",
-      status: undefined,
-      storeId: undefined,
-      lines: (record.lines || []).map((line: any) => ({
-        ...line,
-        id: undefined,
-        tempId: randomId(),
-        inventoryAdjustmentId: undefined,
-      })),
-    } as any);
-    setOpen(true);
-  };
-  const handleOpenAdd = create
-    ? () => {
-        setRowData(undefined);
-        setDefaultData(undefined);
-        setOpen(true);
-      }
-    : undefined;
-  const handleOpenEdit = (record: InventoryAdjustment) => {
-    setDefaultData(undefined);
-    setRowData(record);
-    setOpen(true);
-  };
-  const handleOpenDetail = (record: InventoryAdjustment) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-  const handleOpenEditFromDetail = (record: InventoryAdjustment) => {
-    setOpenDetail(false);
-    handleOpenEdit(record);
-  };
-  const handleDelete = (record: InventoryAdjustment) => remove?.(record.id);
+  const {
+    handleCopy,
+    handleOpenAdd,
+    handleOpenEdit,
+    handleOpenDetail,
+    handleOpenEditFromDetail,
+    handleDelete,
+  } = useInventoryAdjustmentHandlers({
+    create,
+    update,
+    remove,
+    getById,
+    setOpen,
+    setOpenDetail,
+    setRowData,
+    setDefaultData,
+  });
   return (
     <div className="flex flex-col h-full w-full gap-3">
       <div className="flex min-h-0 flex-1 gap-3">
