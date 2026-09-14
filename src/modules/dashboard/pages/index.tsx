@@ -77,7 +77,7 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="min-h-full h-fit w-full">
       <div className="mx-auto flex max-w-7xl flex-col gap-4">
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <StoreUncontrolledMultipleSelect
             value={storeIds}
             options={availableStores}
@@ -86,7 +86,7 @@ export const DashboardPage: React.FC = () => {
             className="min-w-[240px]"
             maxTagCount="responsive"
           />
-        </div>
+        </div> */}
         <section className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-base font-bold text-gray-900">Kết quả bán hàng hôm nay</h2>
           <MetricsCards data={store.metrics.data} loading={store.metrics.isLoading} />
