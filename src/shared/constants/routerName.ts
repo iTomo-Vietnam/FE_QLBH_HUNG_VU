@@ -42,6 +42,8 @@ export const privateRoutesName = {
 
   // TODO: Sổ quỹ
   incomeExpense: "/income-expenses",
+  transferNote: "/transfer-notes",
+  dailyReport: "/daily-reports",
 
   // TODO: Kế toán
   fund: "/funds",
@@ -204,6 +206,16 @@ export const routeTitleMap: RouteTitleMap = {
     path: privateRoutesName.incomeExpense,
     title: "Thu chi",
     subtitle: "Quản lý các khoản thu và chi",
+  },
+  transferNote: {
+    path: privateRoutesName.transferNote,
+    title: "Ghi chú chuyển khoản",
+    subtitle: "Theo dõi các khoản chuyển khoản cần đối soát",
+  },
+  dailyReport: {
+    path: privateRoutesName.dailyReport,
+    title: "Báo cáo hằng ngày",
+    subtitle: "Tổng hợp hoạt động và dòng tiền trong ngày",
   },
   fund: {
     path: privateRoutesName.fund,

@@ -11,7 +11,7 @@ import { OrderValueInput, InputMoney } from "@/shared/components";
 import { DiscountType } from "@/shared/constants/enum";
 import { CachedOrder, PaymentMode } from "@/shared/stores/orderCache.slice";
 import { bank_bin_map } from "@/shared/constants/option/bank";
-import { formatMoney, getCashSuggestions } from "@/shared/utils/number.util";
+import { formatMoney, getCashSuggestions, getCombinedCashSuggestions } from "@/shared/utils/number.util";
 import { QrPay } from "@/shared/utils/qrcode";
 import QRCode from "qrcode";
 import { PosPayment, PosTotals } from "./PosInvoiceInfo";
@@ -111,7 +111,12 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
     if (Number(payment?.amount || 0) !== paymentDue) updatePayment({ amount: paymentDue });
   }, [activeOrder.id, activeOrder.mode, payment, paymentDue, readOnly, updatePayment]);
 
-  const cashAmountOptions = useMemo(() => getCashSuggestions(paymentDue), [paymentDue]);
+  const cashAmountOptions = useMemo(
+    () => paymentMode === "combined"
+      ? getCombinedCashSuggestions(paymentDue)
+      : getCashSuggestions(paymentDue),
+    [paymentDue, paymentMode],
+  );
   const customer = activeOrder.partner as Partner | undefined;
   const sourceCode = activeOrder.refOrder?.code || activeOrder.code || "Trả nhanh";
   const isCustomerPaying = settlementAmount > 0;
@@ -391,7 +396,7 @@ export const SaleReturnInvoiceInfo: React.FC<Props> = ({
                         <button
                           type="button"
                           className="w-fit font-semibold text-slate-500 transition-all ease-in-out hover:text-primary"
-                          onClick={() => updatePayment({ amount: paymentDue }, 1)}
+                          onClick={() => updatePayment({ amount: Math.max(0, paymentDue - Number(cashPayment.amount || 0)) }, 1)}
                         >
                           {isCustomerPaying ? "Thanh toán toàn bộ" : "Hoàn tiền toàn bộ"}
                         </button>

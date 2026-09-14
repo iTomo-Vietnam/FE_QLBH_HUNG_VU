@@ -77,6 +77,7 @@ export const SideBarMenuItems = (): MenuItem[] => {
     <Icon icon="material-symbols:account-balance-wallet-outline" />,
     [
       can("incomeExpense") && item(privateRoutesName.incomeExpense, "Sổ quỹ"),
+      can("transferNote") && item(privateRoutesName.transferNote, "Ghi chú chuyển khoản"),
       // can("fundTransfer") && item(privateRoutesName.fundTransfer, "Chuyển quỹ"),
       // can("fundAdjustment") && item(privateRoutesName.fundAdjustment, "Điều chỉnh số dư"),
       can("debtAdjustment") && item(privateRoutesName.debtAdjustment, "Điều chỉnh công nợ"),
@@ -108,6 +109,8 @@ export const SideBarMenuItems = (): MenuItem[] => {
           item(privateRoutesName.analysis.customer, "Khách hàng"),
           item(privateRoutesName.analysis.effectiveness, "Hiệu quả"),
         ]),
+      can("dailyReport") &&
+        item(privateRoutesName.dailyReport, "Báo cáo hằng ngày", <Icon icon="solar:chart-2-outline" />),
       can("reports") &&
         ({
           key: "reports-empty",

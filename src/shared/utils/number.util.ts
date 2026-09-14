@@ -189,3 +189,17 @@ export const getCashSuggestions = (paymentDue: number) => {
 
   return [...suggestions].filter((amount) => amount >= paymentDue).sort((a, b) => a - b);
 };
+
+/** Gợi ý tiền mặt cho thanh toán kết hợp: luôn là mệnh giá tròn và nhỏ hơn tổng cần thu. */
+export const getCombinedCashSuggestions = (paymentDue: number) => {
+  if (!paymentDue || paymentDue <= 0) return [];
+
+  const steps = [10_000, 20_000, 50_000, 100_000, 500_000];
+  const suggestions = new Set<number>();
+  for (const step of steps) {
+    const amount = Math.floor(paymentDue / step) * step;
+    if (amount > 0 && amount < paymentDue) suggestions.add(amount);
+  }
+
+  return [...suggestions].sort((a, b) => a - b);
+};

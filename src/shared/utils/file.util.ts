@@ -4,6 +4,12 @@ import { FileCategory, EntityType } from "@/shared/constants/enum";
 import { BASE_URL, HOST_URL, apiEndpoint } from "@/shared/constants/apiEndpoint";
 import { buildUrlWithId } from "@/shared/utils/url.util";
 import { File } from "@/shared/interfaces/file";
+import { getInitialCurrentStore } from "@/shared/stores/global.slice";
+
+const getFileRequestHeaders = (): Record<string, string> => {
+  const currentStoreId = getInitialCurrentStore()?.id;
+  return currentStoreId ? { "x-store-id": currentStoreId } : {};
+};
 
 export function parseFileInfo(fileName: string) {
   if (!fileName.includes("-")) {
@@ -116,6 +122,7 @@ export async function uploads({
       headers: {
         "x-device-id": deviceId || "1",
         "x-timezone": timeZone,
+        ...getFileRequestHeaders(),
       },
     });
 
@@ -145,12 +152,11 @@ export async function setMainFile(fileId: string): Promise<boolean> {
       headers: {
         "x-device-id": deviceId || "1",
         "x-timezone": timeZone,
+        ...getFileRequestHeaders(),
       },
     });
     if (!response.ok) {
       const result = await response.json();
-      if (result && result.message) {
-      }
       console.error("Failed to set main file with id:", result);
       return false;
     }
@@ -176,6 +182,7 @@ export async function deleteFile(
       headers: {
         "x-device-id": deviceId || "1",
         "x-timezone": timeZone,
+        ...getFileRequestHeaders(),
       },
     });
     if (!response.ok) {
@@ -204,6 +211,7 @@ export async function deletePendingFiles(entityId: string): Promise<boolean> {
         headers: {
           "x-device-id": deviceId || "1",
           "x-timezone": timeZone,
+          ...getFileRequestHeaders(),
         },
       },
     );

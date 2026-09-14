@@ -220,6 +220,12 @@ export const apiEndpoint = {
     transfer: "/fund-balance/transfer",
   },
   incomeExpense: { base: "/income-expense" },
+  transferNote: { base: "/transfer-note" },
+  dailyReport: {
+    base: "/daily-report",
+    current: "/daily-report/current",
+    cancel: "/daily-report/:id/cancel",
+  },
   invoice: { base: "/invoice", line: "/invoice/:invoiceId/line" },
   paymentRequest: {
     base: "/payment-request",

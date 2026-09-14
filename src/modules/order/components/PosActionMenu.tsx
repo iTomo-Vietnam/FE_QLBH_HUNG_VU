@@ -16,6 +16,8 @@ import {
 import { IncomeExpenseAddUpdateModal } from "@/modules/incomeExpense/components/IncomeExpenseAddUpdateModal";
 import { useIncomeExpenseStore } from "@/modules/incomeExpense/incomeExpense.store";
 import { IncomeExpenseType } from "@/modules/incomeExpense/incomeExpense.model";
+import { DailyReportModal } from "@/modules/dailyReport/components/DailyReportModal";
+import { useDailyReportStore } from "@/modules/dailyReport/dailyReport.store";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { privateRoutesName, publicRoutesName } from "@/shared/constants/routerName";
 import type { CachedOrder, PosOrderType } from "@/shared/stores/orderCache.slice";
@@ -41,11 +43,13 @@ export const PosActionMenu = ({
   const { logout } = useAuth();
   const importFileRef = useRef<HTMLInputElement>(null);
   const [incomeExpenseOpen, setIncomeExpenseOpen] = useState(false);
+  const [dailyReportOpen, setDailyReportOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const incomeStore = useIncomeExpenseStore(
     { isLocked: true, type: IncomeExpenseType.INCOME },
     () => setIncomeExpenseOpen(false),
   );
+  const dailyReportStore = useDailyReportStore({ page: 1, size: 1, isLocked: true });
   const isSaleReturn = type === OrderType.SALE_RETURN;
 
   const handleLogout = () => {
@@ -72,9 +76,10 @@ export const PosActionMenu = ({
   const items: MenuProps["items"] = [
     {
       key: "end-of-day",
-      label: "Xem báo cáo cuối ngày (Chờ chức năng)",
-      disabled: true,
+      label: "Báo cáo cuối ngày",
+      disabled: !dailyReportStore.getCurrent,
       icon: <ChartBarIcon className="h-5 w-5" />,
+      onClick: () => setDailyReportOpen(true),
     },
     {
       key: "return",
@@ -170,6 +175,7 @@ export const PosActionMenu = ({
         onAdd={(data) => incomeStore.create?.(data)}
         onClose={() => setIncomeExpenseOpen(false)}
       />
+      <DailyReportModal open={dailyReportOpen} onClose={() => setDailyReportOpen(false)} />
     </>
   );
 };

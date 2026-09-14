@@ -3,12 +3,7 @@ import { Form, FormProps, Input, Modal, TimePicker } from "antd";
 import dayjs from "dayjs";
 import { Store } from "@/shared/base/entity";
 import { SubmitButton } from "@/shared/components";
-import {
-  AvatarUpload,
-  Label,
-  ProvinceSelect,
-  WardSelect,
-} from "@/shared/components";
+import { AvatarUpload, Label, ProvinceSelect, WardSelect } from "@/shared/components";
 import { EntityType, FileCategory } from "@/shared/constants";
 import { getMainFile, parseFormDataDates, randomId, setFormErrors } from "@/shared/utils";
 import { useAddressSelector } from "@/shared/hooks";
@@ -175,9 +170,15 @@ export const StoreAddUpdateModal: React.FC<AddUpdateModalProps<Store>> = ({
           <Form.Item
             name="workEndTime"
             label={<Label title="Giờ kết thúc làm việc" />}
-            extra="Sau giờ này 1 tiếng, các phiếu nháp chưa hoàn thành sẽ được tự động hủy."
+            // extra="Sau giờ này 1 tiếng, các phiếu nháp chưa hoàn thành sẽ được tự động hủy."
           >
-            <TimePicker format="HH:mm" minuteStep={5} className="w-full" placeholder="Chọn giờ kết thúc" />
+            <TimePicker
+              format="HH:mm"
+              minuteStep={5}
+              className="w-full"
+              placeholder="Chọn giờ kết thúc"
+              needConfirm={false}
+            />
           </Form.Item>
 
           <Form.Item name="note" label={<Label title="Ghi chú" />}>

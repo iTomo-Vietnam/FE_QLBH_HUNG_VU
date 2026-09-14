@@ -22,6 +22,8 @@ export const privateRoutes: { path: string; component: React.FC }[] = [
   { path: privateRoutesName.purchaseReturn, component: desktopPage.PurchaseReturnPage },
   { path: privateRoutesName.customer, component: desktopPage.CustomerPage },
   { path: privateRoutesName.incomeExpense, component: desktopPage.IncomeExpensePage },
+  { path: privateRoutesName.transferNote, component: desktopPage.TransferNotePage },
+  { path: privateRoutesName.dailyReport, component: desktopPage.DailyReportPage },
   { path: privateRoutesName.fund, component: desktopPage.FundPage },
   { path: privateRoutesName.fundAdjustment, component: desktopPage.FundAdjustmentPage },
   { path: privateRoutesName.fundTransfer, component: desktopPage.FundTransferPage },

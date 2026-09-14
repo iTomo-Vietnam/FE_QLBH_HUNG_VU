@@ -1,6 +1,6 @@
 /** Permission modules — single source of truth matching BE permission.middleware.ts. */
 export const MODULES = [
-  "report", // Báo cáo
+  "dashboard", // Tổng quan
   "analysis", // Phân tích
   "reports", // Báo cáo chi tiết
   "debtReport", // Báo cáo công nợ
@@ -21,6 +21,8 @@ export const MODULES = [
 
   // Tài chính & kế toán
   "incomeExpense", // Thu chi
+  "transferNote", // Ghi chú chuyển khoản
+  "dailyReport", // Báo cáo hằng ngày
   "fund", // Quỹ
   "fundAdjustment", // Điều chỉnh số dư quỹ
   "fundTransfer", // Chuyển quỹ
@@ -48,7 +50,7 @@ export type Permission = (typeof PERMISSIONS)[number];
 export type PermissionStructure = { [key in Module]?: Permission[] };
 
 export const ReadOnlyModules: Module[] = [
-  "report",
+  "dashboard",
   "analysis",
   "reports",
   "debtReport",
@@ -64,6 +66,7 @@ export const CompleteModules: Module[] = [
   "purchase",
   "purchaseReturn",
   "storeTransfer",
+  "incomeExpense",
 ];
 
 export const readPermissionFallbackMap: Partial<Record<Module, Module[]>> = {
@@ -81,7 +84,7 @@ export const readPermissionFallbackMap: Partial<Record<Module, Module[]>> = {
 };
 
 export const moduleMap: Record<Module, string> = {
-  report: "Báo cáo tổng quan",
+  dashboard: "Tổng quan",
   analysis: "Phân tích",
   reports: "Báo cáo chi tiết",
   debtReport: "Báo cáo công nợ",
@@ -96,6 +99,8 @@ export const moduleMap: Record<Module, string> = {
   inventoryAdjustment: "Điều chỉnh tồn kho",
   internalExport: "Xuất nội bộ",
   incomeExpense: "Thu chi",
+  transferNote: "Ghi chú chuyển khoản",
+  dailyReport: "Báo cáo hằng ngày",
   fund: "Quỹ",
   fundAdjustment: "Điều chỉnh quỹ",
   fundTransfer: "Chuyển quỹ",
@@ -123,7 +128,16 @@ export const permissionMap: Record<Permission, string> = {
 export const role: { title: string; modules: Module[] }[] = [
   {
     title: "Báo cáo",
-    modules: ["report", "analysis", "reports", "debtReport", "inventoryReport", "fundReport", "vatReport"],
+    modules: [
+      "dashboard",
+      "analysis",
+      "reports",
+      "debtReport",
+      "inventoryReport",
+      "fundReport",
+      "vatReport",
+      "dailyReport",
+    ],
   },
   { title: "Kinh doanh", modules: ["customer", "sale", "saleReturn"] },
   {
@@ -135,6 +149,7 @@ export const role: { title: string; modules: Module[] }[] = [
     title: "Tài chính",
     modules: [
       "incomeExpense",
+      "transferNote",
       "fund",
       "fundTransfer",
       "fundAdjustment",

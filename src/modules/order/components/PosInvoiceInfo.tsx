@@ -13,7 +13,7 @@ import { bank_bin_map } from "@/shared/constants/option/bank";
 import { DiscountType } from "@/shared/constants/enum";
 import { InputMoney, Label, OrderValueInput } from "@/shared/components";
 import { CachedOrder, PaymentMode, PosOrderType } from "@/shared/stores/orderCache.slice";
-import { formatMoney, getCashSuggestions } from "@/shared/utils/number.util";
+import { formatMoney, getCashSuggestions, getCombinedCashSuggestions } from "@/shared/utils/number.util";
 import { QrPay } from "@/shared/utils/qrcode";
 import QRCode from "qrcode";
 
@@ -103,7 +103,12 @@ export const PosInvoiceInfo: React.FC<Props> = ({
   //     (amount) => amount >= paymentDue,
   //   );
   // }, [paymentDue]);
-  const cashAmountOptions = useMemo(() => getCashSuggestions(paymentDue), [paymentDue]);
+  const cashAmountOptions = useMemo(
+    () => paymentMode === "combined"
+      ? getCombinedCashSuggestions(paymentDue)
+      : getCashSuggestions(paymentDue),
+    [paymentDue, paymentMode],
+  );
 
   useEffect(() => {
     const bin = bank_bin_map[bankFund?.bank || ""];
@@ -339,7 +344,7 @@ export const PosInvoiceInfo: React.FC<Props> = ({
                 <button
                   type="button"
                   className="w-fit font-semibold text-slate-500 transition-all ease-in-out hover:text-primary"
-                  onClick={() => updatePayment({ amount: paymentDue }, 1)}
+                  onClick={() => updatePayment({ amount: Math.max(0, paymentDue - Number(cashPayment.amount || 0)) }, 1)}
                 >
                   Thanh toán toàn bộ
                 </button>

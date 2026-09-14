@@ -29,7 +29,7 @@ const calculationOptions = [
 
 export const DashboardPage: React.FC = () => {
   const { getAvailableStores } = useGlobalData();
-  const availableStores = getAvailableStores("report");
+  const availableStores = getAvailableStores("dashboard");
   const defaultTimeView = getDashboardDefaultTimeView();
   const [revenueTimeView, setRevenueTimeView] = useState(defaultTimeView);
   const [revenueTypeView, setRevenueTypeView] = useState(DashboardTypeView.DAY);

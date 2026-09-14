@@ -42,7 +42,7 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
     editData ? onEdit?.(payload) : onAdd?.(payload);
   };
 
-  const colgroupWidthConfig = [undefined, 220, 32];
+  const colgroupWidthConfig = [undefined, 320, 32];
   return (
     <Modal
       open={open}
@@ -203,7 +203,7 @@ export const AddUpdateModal: React.FC<AddUpdateModalProps<User>> = ({
                             <td className="px-2">
                               <Form.Item
                                 name={[name, "roleId"]}
-                                className="mb-0"
+                                noStyle
                                 rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
                               >
                                 <RoleSelect
