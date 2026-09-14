@@ -384,7 +384,7 @@ export const DropdownAction: React.FC<DropdownActionProps> = ({
     },
   ].filter((item) => item !== undefined);
 
-  const buttonSize = size === "middle" ? "h-8 w-12" : "h-6 w-10";
+  const buttonSize = size === "middle" ? "h-8 w-12" : "h-6 w-8";
   const icon = `${size === "middle" ? "w-5 h-5" : "w-4 h-4"} ${isSelected ? "text-white" : ""}`;
 
   if (items.length === 0) return null;

@@ -116,13 +116,13 @@ export const FundAddUpdateModal: React.FC<FundAddUpdateModalProps> = ({
               </Form.Item>
             </Col>
             {!editData && (
-              <Col xs={12}>
+              <Col xs={24}>
                 <Form.Item name="initialBalance" label={<Label title="Số dư ban đầu" />}>
                   <InputMoney notRightAlign placeholder="Nhập số dư ban đầu" />
                 </Form.Item>
               </Col>
             )}
-            <Col xs={!editData ? 12 : 24}>
+            <Col xs={24} sm={12}>
               <Form.Item name="isActive" label="Trạng thái" valuePropName="checked">
                 <AppSwitch label="Đang hoạt động" />
               </Form.Item>

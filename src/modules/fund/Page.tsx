@@ -109,35 +109,21 @@ const FundPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-3">
-      <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
-        <div>
-          <h2 className="flex items-center gap-2 text-xl font-bold text-blue-800 dark:text-blue-200">
-            <BanknotesIcon className="h-5 w-5" />
-            Danh sách quỹ
-          </h2>
-          <p className="text-xs text-secondary">
-            {currentStore
-              ? `Quản lý quỹ của ${currentStore.name} và các quỹ toàn hệ thống`
-              : "Quản lý các quỹ dùng chung cho toàn bộ cửa hàng"}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-end gap-2">
-          <SearchInput value={keyword} onSearch={pageAction.handleSearch} maxWidth={300} />
-          {currentStore && (
-            <AddButton
-              title="Thêm quỹ tiền mặt"
-              icon={<BanknotesIcon className="h-4 w-4" />}
-              onOpenAdd={store.create ? () => handleOpenAdd(FundType.CASH) : undefined}
-            />
-          )}
+    <div className="flex h-fit min-h-full w-full flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <SearchInput value={keyword} onSearch={pageAction.handleSearch} />
+        {/* {currentStore && (
           <AddButton
-            title="Thêm tài khoản ngân hàng"
-            icon={<CreditCardIcon className="h-4 w-4" />}
-            onOpenAdd={store.create ? () => handleOpenAdd(FundType.BANK) : undefined}
+            title="Thêm quỹ tiền mặt"
+            icon={<BanknotesIcon className="h-4 w-4" />}
+            onOpenAdd={store.create ? () => handleOpenAdd(FundType.CASH) : undefined}
           />
-        </div>
+        )} */}
+        <AddButton
+          title="Thêm tài khoản ngân hàng"
+          icon={<CreditCardIcon className="h-4 w-4" />}
+          onOpenAdd={store.create ? () => handleOpenAdd(FundType.BANK) : undefined}
+        />
       </div>
 
       <FundList
@@ -185,4 +171,3 @@ const FundPage: React.FC = () => {
 };
 
 export default FundPage;
-

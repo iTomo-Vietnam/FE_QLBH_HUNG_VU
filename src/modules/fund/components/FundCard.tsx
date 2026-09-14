@@ -110,6 +110,7 @@ export const FundCard: React.FC<FundCardProps> = ({
           )}
           <DropdownAction
             type="horizontal"
+            size="small"
             onEdit={onEdit && !isLocked ? () => onEdit(item) : undefined}
             onDelete={onDelete && !isLocked ? () => onDelete(item) : undefined}
           />
