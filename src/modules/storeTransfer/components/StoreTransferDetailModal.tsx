@@ -74,15 +74,18 @@ export const StoreTransferDetailModal: React.FC<Props> = ({
             ? `${formatDateTimeDDMMYYYY(data.importedAt)} · ${actorName(data.importerSnapshot)}`
             : "--"}
         </Descriptions.Item>
-        <Descriptions.Item label="Đã hủy" span={2}>
-          {data.canceledAt
-            ? `${formatDateTimeDDMMYYYY(data.canceledAt)} · ${actorName(data.cancelerSnapshot)}`
-            : "--"}
-        </Descriptions.Item>
+        {data.status === StoreTransferStatus.CANCELED && (
+          <Descriptions.Item label="Đã hủy" span={2}>
+            {data.canceledAt
+              ? `${formatDateTimeDDMMYYYY(data.canceledAt)} · ${actorName(data.cancelerSnapshot)}`
+              : "--"}
+          </Descriptions.Item>
+        )}
       </Descriptions>
       <Table
         rowKey="id"
         className="mt-4"
+        size="small"
         pagination={false}
         dataSource={data.lines || []}
         columns={[
@@ -117,10 +120,10 @@ export const StoreTransferDetailModal: React.FC<Props> = ({
         {onOpenUpdate &&
           data._actions?.update?.can &&
           canEditStoreTransfer(data, currentStore?.id) && (
-          <Button type="primary" onClick={() => onOpenUpdate(data)}>
-            Chỉnh sửa
-          </Button>
-        )}
+            <Button type="primary" onClick={() => onOpenUpdate(data)}>
+              Chỉnh sửa
+            </Button>
+          )}
       </div>
     </Modal>
   );

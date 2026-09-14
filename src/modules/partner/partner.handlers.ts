@@ -15,26 +15,15 @@ export function usePartnerHandlers({
   const [form] = Form.useForm<any>();
 
   const handleOpenDetail = (record: Partner) => {
+    const open = (data?: Partner | null) => {
+      if (!data) return;
+      setRowData(data);
+      setOpenDetail ? setOpenDetail(true) : setOpen?.(true);
+    };
+
     if (!!getById) {
-      getById(record.id, {
-        onSuccess: (data) => {
-          if (!data) return;
-          setRowData(data);
-          if (setOpenDetail) {
-            setOpenDetail(true);
-          } else {
-            setOpen?.(true);
-          }
-        },
-      });
-    } else {
-      setRowData(record);
-      if (setOpenDetail) {
-        setOpenDetail(true);
-      } else {
-        setOpen?.(true);
-      }
-    }
+      getById(record.id, { onSuccess: open });
+    } else open(record);
   };
 
   const handleOpenAdd = create
@@ -55,6 +44,7 @@ export function usePartnerHandlers({
         });
       }
     : undefined;
+
   const handleDelete = remove
     ? (record: Partner) => {
         modal.confirm({

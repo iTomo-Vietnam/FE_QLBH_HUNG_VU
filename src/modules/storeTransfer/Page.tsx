@@ -194,7 +194,12 @@ export const StoreTransferPage: React.FC = () => {
     <div className="flex h-full w-full flex-col gap-3">
       <div className="flex min-h-0 flex-1 gap-3">
         <PanelFilter
-          filterActive={isFilterActive || statusValues.length > 0 || fromStores.length > 0 || toStores.length > 0}
+          filterActive={
+            isFilterActive ||
+            statusValues.length > 0 ||
+            fromStores.length > 0 ||
+            toStores.length > 0
+          }
           sortItems={sortItems}
           sortValue={{ sortBy, sortOrder }}
           onSortChange={pageAction.handleSortChange}

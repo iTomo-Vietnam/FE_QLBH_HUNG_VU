@@ -70,13 +70,6 @@ export const StoreTransferTable: React.FC<ObjectTableProps> = (props) => {
           record.toStore?.name || record.toStoreSnapshot?.name || "--",
       },
       {
-        title: "Số dòng",
-        key: "lines",
-        width: 90,
-        align: "right",
-        render: (_value: unknown, record: StoreTransfer) => record.lines?.length || 0,
-      },
-      {
         title: "Tổng số lượng",
         key: "quantity",
         width: 130,

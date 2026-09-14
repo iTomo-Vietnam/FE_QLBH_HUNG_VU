@@ -224,10 +224,7 @@ export interface HandlersInput<T extends Entity> {
     | ((data: Partial<T>[], opts?: { onSuccess?: () => void }) => void);
 
   update?: (data: Partial<T>, opts?: { onSuccess?: () => void }) => void;
-  remove?: (
-    id: string | PayloadWithSubId,
-    opts?: { onSuccess?: () => void },
-  ) => void;
+  remove?: (id: string | PayloadWithSubId, opts?: { onSuccess?: () => void }) => void;
   cancel?: (id: string, reason?: string) => Promise<void>;
   getById?: (
     id: string | PayloadWithSubId,
@@ -258,7 +255,6 @@ export type FilterKey =
   | "shipperGroupIds"
   | "fundIds"
   | "orderIds"
-  | "itemIds"
   | "storeIds"
   | "roleIds"
   | "productIds"
