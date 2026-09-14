@@ -1,6 +1,6 @@
 import { FilterKey, RangerItem, SortItem } from "@/shared/interfaces/common";
 
-export const filterUses: FilterKey[] = ["productIds", "creatorIds"];
+export const filterUses: FilterKey[] = ["productIds", "creatorIds", "exporterIds", "importerIds"];
 export const rangerItems: RangerItem[] = [
   { label: "Ngày chuyển", key: "occurredAt", type: "date" },
 ];

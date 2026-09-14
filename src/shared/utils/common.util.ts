@@ -37,8 +37,10 @@ export const getPageTitle = (customTitle?: string | null, companyName?: string) 
 export const formatPayload = (payload?: any) => {
   const {
     creatorIds,
-    completerIds,
     updaterIds,
+    completerIds,
+    exporterIds,
+    importerIds,
     userIds,
     supplierIds,
     customerIds,
@@ -62,8 +64,10 @@ export const formatPayload = (payload?: any) => {
   return {
     ...rest,
     creatorIds: normalizeIdsField(creatorIds),
-    completerIds: normalizeIdsField(completerIds),
     updaterIds: normalizeIdsField(updaterIds),
+    completerIds: normalizeIdsField(completerIds),
+    exporterIds: normalizeIdsField(exporterIds),
+    importerIds: normalizeIdsField(importerIds),
     userIds: normalizeIdsField(userIds),
     supplierIds: normalizeIdsField(supplierIds),
     customerIds: normalizeIdsField(customerIds),

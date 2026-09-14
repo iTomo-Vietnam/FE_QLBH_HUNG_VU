@@ -34,8 +34,10 @@ type FilterDefinition = {
 
 const filterMap: Partial<Record<FilterKey, FilterDefinition>> = {
   creatorIds: { defaultLabel: "Người tạo", component: UserFilter },
-  completerIds: { defaultLabel: "Người hoàn thành", component: UserFilter },
   updaterIds: { defaultLabel: "Người cập nhật", component: UserFilter },
+  completerIds: { defaultLabel: "Người hoàn thành", component: UserFilter },
+  exporterIds: { defaultLabel: "Người xuất kho", component: UserFilter },
+  importerIds: { defaultLabel: "Người nhập kho", component: UserFilter },
   userIds: { defaultLabel: "Người dùng", component: UserFilter },
   supplierIds: { defaultLabel: "Nhà cung cấp", component: SupplierFilter },
   customerIds: { defaultLabel: "Khách hàng", component: CustomerFilter },
@@ -47,7 +49,6 @@ const filterMap: Partial<Record<FilterKey, FilterDefinition>> = {
   fundIds: { defaultLabel: "Quỹ", component: FundFilter },
   unitIds: { defaultLabel: "Đơn vị tính", component: UnitFilter },
   orderIds: { defaultLabel: "Đơn hàng", component: OrderFilter },
-  itemIds: { defaultLabel: "Mặt hàng", component: ProductFilter },
   storeIds: { defaultLabel: "Cửa hàng", component: StoreFilter },
   roleIds: { defaultLabel: "Vai trò", component: RoleFilter },
   productIds: { defaultLabel: "Hàng hóa", component: ProductFilter },
@@ -88,10 +89,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       {
         key,
         label: (
-          <div
-            className="flex justify-between items-center"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="flex justify-between items-center" onClick={(e) => e.stopPropagation()}>
             <span
               onClick={() => {
                 if (!activeKeys.includes(key)) {

@@ -243,8 +243,10 @@ export interface HandlersInput<T extends Entity> {
 // * === Filter Interface ===
 export type FilterKey =
   | "creatorIds"
-  | "completerIds"
   | "updaterIds"
+  | "completerIds"
+  | "exporterIds"
+  | "importerIds"
   | "userIds"
   | "supplierIds"
   | "customerIds"

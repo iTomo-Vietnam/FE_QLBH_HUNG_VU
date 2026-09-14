@@ -1,27 +1,22 @@
 import React, { useState } from "react";
-import { App } from "antd";
 import { AddButton, Panel, PanelFilter, SearchInput } from "@/shared/components";
 import { StoreMultipleSelect } from "@/modules/store/components/Select";
 import { Store } from "@/shared/base/entity";
 import { usePageState } from "@/shared/hooks/usePageState";
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
 import { SortOrder } from "@/shared/constants/enum";
-import { checkSelection, randomId } from "@/shared/utils/common.util";
+import { checkSelection } from "@/shared/utils/common.util";
 import {
   StoreTransfer,
-  canCancelStoreTransfer,
-  canEditStoreTransfer,
-  canExportStoreTransfer,
-  canImportStoreTransfer,
   StoreTransferStatus,
   storeTransferStatusLabels,
 } from "./storeTransfer.model";
 import { useStoreTransferStore } from "./storeTransfer.store";
+import { useStoreTransferHandlers } from "./storeTransfer.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { StoreTransferDetailModal, StoreTransferModal, StoreTransferTable } from "./components";
 
 export const StoreTransferPage: React.FC = () => {
-  const { modal } = App.useApp();
   const { currentStore } = useGlobalData();
   const [statusValues, setStatusValues] = useState<StoreTransferStatus[]>([]);
   const [fromStores, setFromStores] = useState<Store[]>([]);
@@ -64,96 +59,31 @@ export const StoreTransferPage: React.FC = () => {
     },
     pageAction.handleClose,
   );
-  const openEdit = (record: StoreTransfer) => {
-    if (!canEditStoreTransfer(record, currentStore?.id)) return;
-    setRowData(record);
-    setDefaultData(undefined);
-    setOpen(true);
-  };
-  const openDetail = (record: StoreTransfer) => {
-    setRowData(record);
-    setOpenDetail(true);
-  };
-  const handleOpenAdd = store.create
-    ? () => {
-        setRowData(undefined);
-        setDefaultData(undefined);
-        setOpen(true);
-      }
-    : undefined;
-  const handleDelete = (record: StoreTransfer) => store.remove?.(record.id);
-  const handleExport = (record: StoreTransfer) => {
-    if (!canExportStoreTransfer(record, currentStore?.id)) return;
-    modal.confirm({
-      title: "Xuất kho chuyển hàng",
-      content: "Xác nhận đã xuất hàng khỏi kho chuyển?",
-      okText: "Xác nhận",
-      cancelText: "Đóng",
-      onOk: () => store.exportTransfer?.(record.id),
-    });
-  };
-  const handleImport = (record: StoreTransfer) => {
-    if (!canImportStoreTransfer(record, currentStore?.id)) return;
-    modal.confirm({
-      title: "Nhập kho chuyển hàng",
-      content: "Xác nhận đã nhập hàng vào kho nhận?",
-      okText: "Xác nhận",
-      cancelText: "Đóng",
-      onOk: () => store.importTransfer?.(record.id),
-    });
-  };
-  const handleCancel = (record: StoreTransfer) => {
-    if (!canCancelStoreTransfer(record, currentStore?.id)) return;
-    modal.confirm({
-      title: "Hủy phiếu chuyển kho",
-      content: "Phiếu sẽ tạo giao dịch đảo kho theo các mốc đã thực hiện. Tiếp tục?",
-      okText: "Hủy phiếu",
-      okButtonProps: { danger: true },
-      cancelText: "Đóng",
-      onOk: () => store.cancelTransfer?.(record.id),
-    });
-  };
-  const handleCopy = (record: StoreTransfer) => {
-    setOpenDetail(false);
-    setRowData(undefined);
-    setDefaultData({
-      ...record,
-      id: undefined,
-      tempId: randomId(),
-      code: "",
-      status: undefined,
-      exportedAt: null,
-      exporterId: null,
-      exporterSnapshot: null,
-      importedAt: null,
-      importerId: null,
-      importerSnapshot: null,
-      canceledAt: null,
-      cancelerId: null,
-      cancelerSnapshot: null,
-      lines: (record.lines || []).map((line) => ({
-        ...line,
-        id: undefined,
-        tempId: randomId(),
-        transferId: undefined,
-      })),
-    } as any);
-    setOpen(true);
-  };
-  const handleCreateAndExport = (data: Partial<StoreTransfer>) => {
-    store.create?.(data, {
-      onSuccess: (created) => {
-        if (created?.id) void store.exportTransfer?.(created.id);
-      },
-    });
-  };
-  const handleUpdateAndExport = (data: Partial<StoreTransfer>) => {
-    store.update?.(data, {
-      onSuccess: (updated) => {
-        if (updated?.id) void store.exportTransfer?.(updated.id);
-      },
-    });
-  };
+  const {
+    handleOpenAdd,
+    handleOpenEdit,
+    handleOpenDetail,
+    handleDelete,
+    handleExport,
+    handleImport,
+    handleCancel,
+    handleCopy,
+    handleCreateAndExport,
+    handleUpdateAndExport,
+  } = useStoreTransferHandlers({
+    create: store.create,
+    update: store.update,
+    remove: store.remove,
+    getById: store.getById,
+    exportTransfer: store.exportTransfer,
+    importTransfer: store.importTransfer,
+    cancelTransfer: store.cancelTransfer,
+    currentStoreId: currentStore?.id,
+    setOpen,
+    setOpenDetail,
+    setRowData,
+    setDefaultData,
+  });
   const handleClearFilter = () => {
     pageAction.resetFilter();
     setStatusValues([]);
@@ -246,16 +176,16 @@ export const StoreTransferPage: React.FC = () => {
               pagination={store.pagination}
               setPage={setPage}
               setSize={setSize}
-              onEdit={openEdit}
+              onEdit={handleOpenEdit}
               onDelete={handleDelete}
               onExport={handleExport}
               onImport={handleImport}
               onCancel={handleCancel}
               onCopy={store.create ? handleCopy : undefined}
-              onViewDetail={openDetail}
+              onViewDetail={handleOpenDetail}
               onRow={(record: any) => ({
                 onClick: () => {
-                  if (!checkSelection()) openDetail(record);
+                  if (!checkSelection()) handleOpenDetail(record);
                 },
               })}
             />
@@ -281,7 +211,7 @@ export const StoreTransferPage: React.FC = () => {
         open={isDetailOpen}
         data={rowData}
         onClose={() => pageAction.handleClose()}
-        onOpenUpdate={openEdit}
+        onOpenUpdate={handleOpenEdit}
         onCopy={store.create ? handleCopy : undefined}
       />
     </div>
