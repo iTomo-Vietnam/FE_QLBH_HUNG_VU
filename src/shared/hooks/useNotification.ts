@@ -5,20 +5,64 @@ import { getData, postData } from "../api/apiClient";
 import { apiEndpoint } from "../constants/apiEndpoint";
 import { ApiResponse, BaseFailurePayload } from "../interfaces/api";
 import { Notification } from "../interfaces/notification";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useGlobalData } from "./useGlobalData";
 import { useErrorState } from "./useErrorState";
+import { getNotificationTarget } from "@/shared/utils/notificationTarget";
 
 const EMPTY_NOTIFICATIONS: Notification[] = [];
 
 export const useNotification = (params?: { page?: number; size?: number; keyword?: string }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { info, handleSetTotalUnread } = useGlobalData();
+  const location = useLocation();
+  const {
+    info,
+    permissions,
+    currentStore,
+    allStores,
+    handleSetCurrentStore,
+    handleSetTotalUnread,
+  } = useGlobalData();
   const { errors, onError } = useErrorState();
 
   const onClick = (item: Notification) => {
-    const type = item.type;
+    const storePermissions = Object.fromEntries(
+      (info?.storeUsers || []).map((storeUser) => [
+        storeUser.storeId,
+        storeUser.role?.permissions || null,
+      ]),
+    );
+    const target = getNotificationTarget(
+      item,
+      permissions,
+      info?.isAdmin,
+      storePermissions,
+    );
+    if (!target) return;
+
+    const targetStoreId = target.state?.notification?.storeId;
+    if (targetStoreId && targetStoreId !== currentStore?.id) {
+      const targetStore =
+        allStores.find((store) => store.id === targetStoreId) ||
+        info?.storeUsers?.find((storeUser) => storeUser.storeId === targetStoreId)?.store;
+      if (!targetStore) return;
+
+      // Keep the current route alive so the notification state can be consumed
+      // by the destination page after the store context has been changed.
+      handleSetCurrentStore(targetStore, false);
+    }
+
+    const targetPath = target.path.split(/[?#]/, 1)[0].replace(/\/$/, "") || "/";
+    const currentPath = location.pathname.replace(/\/$/, "") || "/";
+
+    if (targetPath === currentPath) {
+      void queryClient.refetchQueries({ type: "active" });
+      if (target.state) navigate(target.path, { state: target.state });
+      return;
+    }
+
+    navigate(target.path, { state: target.state });
   };
 
   // ===== QUERY =====

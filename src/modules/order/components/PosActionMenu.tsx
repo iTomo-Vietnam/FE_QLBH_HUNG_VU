@@ -18,6 +18,10 @@ import { useIncomeExpenseStore } from "@/modules/incomeExpense/incomeExpense.sto
 import { IncomeExpenseType } from "@/modules/incomeExpense/incomeExpense.model";
 import { DailyReportModal } from "@/modules/dailyReport/components/DailyReportModal";
 import { useDailyReportStore } from "@/modules/dailyReport/dailyReport.store";
+import { TransferNoteAddUpdateModal } from "@/modules/transferNote/components";
+import { useTransferNoteStore } from "@/modules/transferNote/transferNote.store";
+import { FundType } from "@/modules/fund/fund.model";
+import type { IncomeExpense } from "@/modules/incomeExpense/incomeExpense.model";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { privateRoutesName, publicRoutesName } from "@/shared/constants/routerName";
 import type { CachedOrder, PosOrderType } from "@/shared/stores/orderCache.slice";
@@ -43,6 +47,7 @@ export const PosActionMenu = ({
   const { logout } = useAuth();
   const importFileRef = useRef<HTMLInputElement>(null);
   const [incomeExpenseOpen, setIncomeExpenseOpen] = useState(false);
+  const [transferNoteOpen, setTransferNoteOpen] = useState(false);
   const [dailyReportOpen, setDailyReportOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const incomeStore = useIncomeExpenseStore(
@@ -50,7 +55,28 @@ export const PosActionMenu = ({
     () => setIncomeExpenseOpen(false),
   );
   const dailyReportStore = useDailyReportStore({ page: 1, size: 1, isLocked: true });
+  const transferNoteStore = useTransferNoteStore(
+    { isLocked: true },
+    () => setTransferNoteOpen(false),
+  );
   const isSaleReturn = type === OrderType.SALE_RETURN;
+
+  const handleIncomeCreated = (created?: IncomeExpense) => {
+    const isBank =
+      created?.fund?.type === FundType.BANK || created?.fundSnapshot?.type === FundType.BANK;
+    if (!isBank || !created?.code || !transferNoteStore.create) return;
+    modal.success({
+      centered: true,
+      title: "Tạo phiếu thu thành công",
+      content: (
+        <span>
+          Mã phiếu: <strong>{created.code}</strong>. Phiếu có thu chuyển khoản.
+        </span>
+      ),
+      okText: "Ghi chú chuyển khoản",
+      onOk: () => setTransferNoteOpen(true),
+    });
+  };
 
   const handleLogout = () => {
     modal.confirm({
@@ -172,8 +198,15 @@ export const PosActionMenu = ({
         type={IncomeExpenseType.INCOME}
         errors={incomeStore.errors}
         loading={incomeStore.creating}
-        onAdd={(data) => incomeStore.create?.(data)}
+        onAdd={(data) => incomeStore.create?.(data, { onSuccess: handleIncomeCreated })}
         onClose={() => setIncomeExpenseOpen(false)}
+      />
+      <TransferNoteAddUpdateModal
+        open={transferNoteOpen}
+        errors={transferNoteStore.errors}
+        loading={transferNoteStore.creating}
+        onAdd={transferNoteStore.create}
+        onClose={() => setTransferNoteOpen(false)}
       />
       <DailyReportModal open={dailyReportOpen} onClose={() => setDailyReportOpen(false)} />
     </>

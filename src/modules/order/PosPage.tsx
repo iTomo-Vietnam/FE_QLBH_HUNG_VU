@@ -45,6 +45,8 @@ import { FundType } from "@/modules/fund/fund.model";
 import { Sale } from "../sale";
 import { SaleA4PrintDocument } from "../sale/components/SaleA4Print";
 import { usePrintHtml } from "@/shared/hooks/usePrintHtml";
+import { TransferNoteAddUpdateModal } from "@/modules/transferNote/components";
+import { useTransferNoteStore } from "@/modules/transferNote/transferNote.store";
 
 type PosLocationState = { order?: Order; openSourcePicker?: boolean };
 
@@ -64,6 +66,7 @@ export const PosPage: React.FC = () => {
   const previousReturnGrossAmount = useRef<{ syncKey: string; amount: number }>();
   const customerSelectRef = useRef<HTMLDivElement>(null);
   const [sourcePickerOpen, setSourcePickerOpen] = useState(false);
+  const [transferNoteOpen, setTransferNoteOpen] = useState(false);
   const {
     contentRef: printContentRef,
     printData,
@@ -80,6 +83,10 @@ export const PosPage: React.FC = () => {
 
   const saleStore = useSaleStore({ page: 1, size: 100, isLocked: true });
   const saleReturnStore = useSaleReturnStore({ page: 1, size: 100, isLocked: true });
+  const transferNoteStore = useTransferNoteStore(
+    { isLocked: true },
+    () => setTransferNoteOpen(false),
+  );
   const orderStore = type === OrderType.SALE ? saleStore : saleReturnStore;
   const productStore = useProductStore({ page: 1, size: 16, isLocked: !currentStore });
 
@@ -394,6 +401,24 @@ export const PosPage: React.FC = () => {
     updateActive({ paymentMode: mode });
   };
 
+  const handleTransferPaymentCreated = useCallback(
+    (savedOrder: Sale) => {
+      if (!transferNoteStore.create || !savedOrder.code) return;
+      modal.success({
+        centered: true,
+        title: "Tạo phiếu thành công",
+        content: (
+          <span>
+            Mã phiếu: <strong>{savedOrder.code}</strong>. Phiếu có thanh toán chuyển khoản.
+          </span>
+        ),
+        okText: "Ghi chú chuyển khoản",
+        onOk: () => setTransferNoteOpen(true),
+      });
+    },
+    [modal, transferNoteStore.create],
+  );
+
   const submit = usePosSubmit({
     type,
     activeOrder,
@@ -409,6 +434,7 @@ export const PosPage: React.FC = () => {
     paymentMode,
     orderStore,
     printSales,
+    onTransferPaymentCreated: handleTransferPaymentCreated,
   });
 
   const { openReturnFromSale } = usePosReturnSource({
@@ -567,6 +593,13 @@ export const PosPage: React.FC = () => {
           setSourcePickerOpen(false);
           navigate(`${privateRoutesName.pos}?type=${OrderType.SALE_RETURN}`);
         }}
+      />
+      <TransferNoteAddUpdateModal
+        open={transferNoteOpen}
+        errors={transferNoteStore.errors}
+        loading={transferNoteStore.creating}
+        onAdd={transferNoteStore.create}
+        onClose={() => setTransferNoteOpen(false)}
       />
     </Layout>
   );

@@ -6,6 +6,7 @@ import { PanelFilter } from "@/shared/components/filters";
 import { usePageState } from "@/shared/hooks/usePageState";
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
 import { SortOrder } from "@/shared/constants/enum";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 import { SaleReturn, OrderStatus, saleReturnStatusItems } from "./model";
 import { useSaleReturnStore } from "./store";
 import { privateRoutesName } from "@/shared/constants/routerName";
@@ -61,6 +62,7 @@ const SaleReturnPage: React.FC = () => {
         state: { openSourcePicker: true },
       }),
   });
+  useNotificationDetailNavigation<SaleReturn>(handlers.handleOpenDetail);
 
   const selectedRecords = store.data.filter((record) => selectedRowKeys.includes(record.id));
   const hasSelectedRecords = selectedRecords.length > 0;

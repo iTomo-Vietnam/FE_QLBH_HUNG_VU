@@ -14,7 +14,7 @@ import {
   BrandFilter,
   LocationFilter,
 } from "./AttributeFilter";
-import { FundFilter } from "./FundFilter";
+import { FundFilter, BankFilter } from "./FundFilter";
 import { OrderFilter } from "./OrderFilter";
 import { ProductFilter } from "./ProductFilter";
 import { RoleFilter } from "./RoleFilter";
@@ -47,6 +47,7 @@ const filterMap: Partial<Record<FilterKey, FilterDefinition>> = {
   supplierGroupIds: { defaultLabel: "Nhóm nhà cung cấp", component: SupplierGroupFilter },
   shipperGroupIds: { defaultLabel: "Nhóm đơn vị vận chuyển", component: ShipperGroupFilter },
   fundIds: { defaultLabel: "Quỹ", component: FundFilter },
+  bankIds: { defaultLabel: "Ngân hàng", component: BankFilter },
   unitIds: { defaultLabel: "Đơn vị tính", component: UnitFilter },
   orderIds: { defaultLabel: "Đơn hàng", component: OrderFilter },
   storeIds: { defaultLabel: "Cửa hàng", component: StoreFilter },

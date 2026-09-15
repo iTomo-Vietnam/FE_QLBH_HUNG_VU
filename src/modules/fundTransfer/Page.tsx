@@ -8,6 +8,7 @@ import { useFundTransferStore } from "./fundTransfer.store";
 import { useFundTransferHandlers } from "./fundTransfer.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { FundTransferAddUpdateModal, FundTransferDetailModal, FundTransferTable } from "./components";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 export const FundTransferPage: React.FC = () => {
   const {
@@ -25,6 +26,7 @@ export const FundTransferPage: React.FC = () => {
     setOpenDetail,
     setRowData,
   });
+  useNotificationDetailNavigation<FundTransfer>(handleDetail);
 
   return <div className="flex h-full w-full gap-3">
     <PanelFilter filterActive={isFilterActive} sortItems={sortItems} sortValue={{ sortBy, sortOrder }} onSortChange={pageAction.handleSortChange} rangerItems={rangerItems} rangerValue={ranger} onRangerChange={pageAction.handleRangerChange} filterUses={filterUses} onClearFilter={pageAction.resetFilter} />

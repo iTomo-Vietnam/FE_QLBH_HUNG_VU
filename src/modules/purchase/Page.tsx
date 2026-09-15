@@ -16,6 +16,7 @@ import { ProductBarcodePrintModal } from "@/modules/product/components/ProductBa
 import { getLineProduct } from "./purchase.util";
 import { SortOrder } from "@/shared/constants/enum";
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 const PurchasePage: React.FC = () => {
   const location = useLocation();
@@ -79,6 +80,7 @@ const PurchasePage: React.FC = () => {
     setBarcodeData,
   });
   const handleOpenAdd = handlers.handleOpenAdd;
+  useNotificationDetailNavigation<Purchase>(handlers.handleOpenDetail);
 
   useEffect(() => {
     if (

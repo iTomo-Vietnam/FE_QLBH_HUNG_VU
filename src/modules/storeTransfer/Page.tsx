@@ -4,6 +4,7 @@ import { StoreMultipleSelect } from "@/modules/store/components/Select";
 import { Store } from "@/shared/base/entity";
 import { usePageState } from "@/shared/hooks/usePageState";
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 import { SortOrder } from "@/shared/constants/enum";
 import { checkSelection } from "@/shared/utils/common.util";
 import {
@@ -93,6 +94,7 @@ export const StoreTransferPage: React.FC = () => {
     setPage,
     resetFilter: pageAction.resetFilter,
   });
+  useNotificationDetailNavigation<StoreTransfer>(handleOpenDetail);
   const storeFilterContent = (
     <div className="space-y-3 px-4 pb-4">
       <div>

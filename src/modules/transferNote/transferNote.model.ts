@@ -1,6 +1,7 @@
 import { Entity } from "@/shared/base/entity";
 import { ApiRequestQuery } from "@/shared/interfaces/api";
 import { Fund, FundSnapshot } from "@/modules/fund/fund.model";
+import { FilterKey, SortItem } from "@/shared/interfaces";
 
 export enum TransferNoteStatus {
   VALID = "valid",
@@ -21,6 +22,7 @@ export interface TransferNote extends Entity {
   storeId: string;
   occurredAt: string | Date;
   referenceCode: string;
+  note: string | null;
   fundId: string;
   fundSnapshot: FundSnapshot | null;
   fund: Fund | null;
@@ -28,3 +30,11 @@ export interface TransferNote extends Entity {
   status: TransferNoteStatus;
   invalidReason: string | null;
 }
+
+export const sortItems: SortItem[] = [
+  { label: "Giờ", value: "occurredAt", ascLabel: "Mới nhất", descLabel: "Cũ nhất" },
+  { label: "Số phiếu đối soát", value: "referenceCode", ascLabel: "A → Z", descLabel: "Z → A" },
+  { label: "Thống kê", value: "amount", ascLabel: "Tăng dần", descLabel: "Giảm dần" },
+];
+
+export const filterUses: FilterKey[] = ["bankIds", "creatorIds"];

@@ -10,6 +10,7 @@ import {
   setThemeMode,
   setTotalUnread,
   setInfo,
+  setPermissions,
   setIsMobile,
   clearState,
   setCurrentStore,
@@ -108,13 +109,20 @@ export const useGlobalData = () => {
       }
       dispatch(setCurrentStore(company));
 
+      if (company && !info?.isAdmin) {
+        const storePermissions = info?.storeUsers?.find(
+          (storeUser) => storeUser.storeId === company.id,
+        )?.role?.permissions;
+        dispatch(setPermissions(storePermissions || null));
+      }
+
       if (reload) {
         setTimeout(() => {
           window.location.reload();
         }, 500);
       }
     },
-    [dispatch],
+    [dispatch, info],
   );
 
   const handleClearState = useCallback(() => {

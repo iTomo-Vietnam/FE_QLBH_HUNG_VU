@@ -16,6 +16,7 @@ import {
   Filter as DebtAdjustmentFilter,
   DebtAdjustmentFilterItem,
 } from "./components";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 export const DebtAdjustmentPage: React.FC = () => {
   const [filterSide, setFilterSide] = React.useState<DebtSide | undefined>();
@@ -84,6 +85,7 @@ export const DebtAdjustmentPage: React.FC = () => {
     setPartnerGroupId,
     setPage,
   });
+  useNotificationDetailNavigation<DebtAdjustment>(handleDetail);
 
   return (
     <div className="flex h-full w-full gap-3">

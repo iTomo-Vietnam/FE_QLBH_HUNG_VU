@@ -1,54 +1,67 @@
 import { App } from "antd";
+import { HandlersInput } from "@/shared/interfaces/common";
 import { TransferNote } from "./transferNote.model";
 
-interface Input {
-  update?: (data: Partial<TransferNote>, opts?: any) => void;
-  remove?: (id: string) => void;
-  getById?: (id: string, opts?: { onSuccess?: (data: TransferNote | null) => void }) => void;
-  setOpen: (open: boolean) => void;
-  setOpenDetail: (open: boolean) => void;
-  setRowData: (data: TransferNote | undefined) => void;
-}
-
 export function useTransferNoteHandlers({
+  create,
   update,
   remove,
   getById,
   setOpen,
   setOpenDetail,
   setRowData,
-}: Input) {
+}: HandlersInput<TransferNote>) {
   const { modal } = App.useApp();
 
-  const withDetails = (record: TransferNote, callback: (data: TransferNote) => void) => {
-    if (getById) getById(record.id, { onSuccess: (data) => data && callback(data) });
-    else callback(record);
+  const handleOpenDetail = (record: TransferNote) => {
+    if (getById) {
+      getById(record.id, {
+        onSuccess: (data) => {
+          if (!data) return;
+          setRowData(data);
+          if (setOpenDetail) setOpenDetail(true);
+          else setOpen?.(true);
+        },
+      });
+    } else {
+      setRowData(record);
+      if (setOpenDetail) setOpenDetail(true);
+      else setOpen?.(true);
+    }
   };
 
-  const handleOpenAdd = () => {
-    setRowData(undefined);
-    setOpen(true);
-  };
-  const handleEdit = update
-    ? (record: TransferNote) => withDetails(record, (data) => {
-        setRowData(data);
-        setOpen(true);
-      })
+  const handleOpenAdd = create
+    ? () => {
+        setRowData(undefined);
+        setOpen?.(true);
+      }
     : undefined;
-  const handleDetail = (record: TransferNote) => withDetails(record, (data) => {
-    setRowData(data);
-    setOpenDetail(true);
-  });
+
+  const handleOpenEdit = update
+    ? (record: TransferNote) => {
+        getById?.(record.id, {
+          onSuccess: (data) => {
+            if (!data) return;
+            setRowData(data);
+            setOpen?.(true);
+          },
+        });
+      }
+    : undefined;
+
   const handleDelete = remove
-    ? (record: TransferNote) => modal.confirm({
-        title: "Xóa ghi chú chuyển khoản",
-        content: `Bạn có chắc muốn xóa phiếu ${record.referenceCode}?`,
-        okText: "Xóa",
-        okButtonProps: { danger: true },
-        cancelText: "Đóng",
-        onOk: () => remove(record.id),
-      })
+    ? (record: TransferNote) => {
+        modal.confirm({
+          centered: true,
+          title: "Xóa ghi chú chuyển khoản",
+          content: `Bạn có chắc muốn xóa ghi chú này"?`,
+          okText: "Xóa",
+          okButtonProps: { danger: true },
+          cancelText: "Hủy",
+          onOk: () => remove(record.id),
+        });
+      }
     : undefined;
 
-  return { handleOpenAdd, handleEdit, handleDetail, handleDelete } as const;
+  return { handleOpenAdd, handleOpenEdit, handleDelete, handleOpenDetail } as const;
 }

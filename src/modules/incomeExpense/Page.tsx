@@ -4,6 +4,7 @@ import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { ButtonFilter } from "@/shared/components/filters";
 import { DateRangeFilter, Panel, SearchInput } from "@/shared/components";
 import { usePageState } from "@/shared/hooks/usePageState";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 import { checkSelection } from "@/shared/utils/common.util";
 import { SortOrder } from "@/shared/constants/enum";
 import { IncomeExpense, IncomeExpenseType } from "./incomeExpense.model";
@@ -88,6 +89,7 @@ export const IncomeExpensePage: React.FC = () => {
       setPage,
       resetFilter: pageAction.resetFilter,
     });
+  useNotificationDetailNavigation<IncomeExpense>(handleOpenDetail);
 
   const isFilterButtonActive = isFilterActive || Boolean(filterType || categoryId);
 

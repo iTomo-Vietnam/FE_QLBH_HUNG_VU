@@ -108,6 +108,7 @@ export const ProductAddUpdateModal: React.FC<AddUpdateModalProps<Product>> = ({
         onFinish={onFinish}
         onFinishFailed={showFormErrorMessages}
         className="flex h-full w-full flex-col"
+        
       >
         <Tabs
           activeKey={activeTab}

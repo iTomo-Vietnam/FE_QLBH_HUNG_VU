@@ -7,6 +7,7 @@ import { Select } from "antd";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { ManagerButton } from "@/shared/components/manager_select/ManagerButton";
 import { AddRoleModal } from "./AddModal";
+import { SmartSelect } from "@/shared/components";
 
 const buildOptions = (list: Role[]) =>
   list.map((role) => ({
@@ -39,51 +40,36 @@ export const RoleSelect: React.FC<SelectProps<Role, RoleQuery>> = ({
       isLocked,
     }),
   });
-  const { errors, newItem, create } = useRoleStore();
 
-  useEffect(() => {
-    if (!newItem) return;
-    onChange?.(newItem.id);
-    onChangeData?.(newItem);
-  }, [newItem, onChange, onChangeData]);
+  const handleChange = (id: string) => {
+    onChange?.(id);
+    const data = list.find((item) => item.id === id);
+    onChangeData?.(data);
+  };
 
   return (
-    <div className="flex w-full z-0">
-      <Select<string>
-        {...(rest as any)}
-        className={`${create ? "w-[calc(100%-40px)] rounded-e-none" : "w-full"} z-10`}
-        options={buildOptions(list)}
-        value={value ?? undefined}
-        loading={loading}
-        placeholder="Chọn vai trò"
-        showSearch
-        filterOption={false}
-        onSearch={setKeywordTemp}
-        onPopupScroll={handlePopupScroll}
-        onChange={(id) => {
-          onChange?.(id || "");
-          onChangeData?.(list.find((item) => item.id === id));
-        }}
-        suffixIcon={<ChevronDownIcon className="h-3.5" />}
-        onFocus={(event) => {
-          unlock();
-          onFocus?.(event);
-        }}
-        disabled={disabled}
-      />
-      {create && (
-        <>
-          <ManagerButton onClick={() => setOpen(true)} disabled={disabled} />
-          <AddRoleModal
-            open={open}
-            loading={loading}
-            errors={errors}
-            onClose={() => setOpen(false)}
-            onAdd={create}
-          />
-        </>
-      )}
-    </div>
+    <SmartSelect<Role>
+      dataSource={list}
+      columns={[
+        {
+          label: "Tên vai trò",
+          dataIndex: "name",
+          className: "w-full",
+          dataType: "string",
+        },
+      ]}
+      value={value}
+      onChange={handleChange}
+      onPopupScroll={handlePopupScroll}
+      placeholder={"Chọn hàng hóa"}
+      loading={loading}
+      onSearch={setKeywordTemp}
+      onFocus={(e) => {
+        unlock();
+        onFocus?.(e);
+      }}
+      {...rest}
+    />
   );
 };
 

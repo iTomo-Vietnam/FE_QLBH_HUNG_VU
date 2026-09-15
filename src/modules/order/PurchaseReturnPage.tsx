@@ -16,6 +16,7 @@ import { PurchaseReturnAddUpdateModal } from "@/modules/purchase/components/Purc
 import { PurchaseReturnDetailModal } from "@/modules/purchase/components/PurchaseReturnDetailModal";
 import { filterUses, rangerItems, sortItems } from "@/modules/purchase/filterItem";
 import { usePurchaseHandlers } from "@/modules/purchase/purchase.handlers";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 const PurchaseReturnPage: React.FC = () => {
   const { currentStore } = useGlobalData();
@@ -78,6 +79,7 @@ const PurchaseReturnPage: React.FC = () => {
   });
 
   const handleOpenAdd = handlers.handleOpenAdd;
+  useNotificationDetailNavigation<Purchase>(handlers.handleOpenDetail);
   const handleClearFilter = () => {
     pageAction.resetFilter();
     setStatusValues([OrderStatus.DRAFT, OrderStatus.COMPLETED]);

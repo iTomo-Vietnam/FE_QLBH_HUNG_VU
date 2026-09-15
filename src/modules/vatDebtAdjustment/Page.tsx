@@ -12,6 +12,7 @@ import {
   VatDebtAdjustmentDetailModal,
   VatDebtAdjustmentTable,
 } from "./components";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 const VatDebtAdjustmentPage: React.FC = () => {
   const {
@@ -52,6 +53,7 @@ const VatDebtAdjustmentPage: React.FC = () => {
       setOpenDetail,
       setRowData,
     });
+  useNotificationDetailNavigation<VatDebtAdjustment>(handleDetail);
 
   return (
     <div className="flex h-full w-full gap-3">

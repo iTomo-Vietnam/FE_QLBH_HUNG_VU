@@ -8,6 +8,7 @@ import { addNewCache, removeOrderCache } from "@/shared/stores/orderCache.slice"
 import type { PosPayment, PosTotals } from "../components/PosInvoiceInfo";
 import { emptyOrder } from "../pos.utils";
 import { Order, OrderType } from "../order.model";
+import { FundType } from "@/modules/fund/fund.model";
 
 type SaveOrder = (data: Partial<Order>, options?: { onSuccess?: (data?: Sale) => void }) => void;
 
@@ -29,6 +30,7 @@ interface Options {
     update?: SaveOrder;
   };
   printSales: (sales: Sale[]) => void;
+  onTransferPaymentCreated?: (order: Sale) => void;
 }
 
 export const usePosSubmit = ({
@@ -46,6 +48,7 @@ export const usePosSubmit = ({
   paymentMode,
   orderStore,
   printSales,
+  onTransferPaymentCreated,
 }: Options) => {
   const dispatch = useDispatch();
   const { message } = App.useApp();
@@ -86,6 +89,12 @@ export const usePosSubmit = ({
         0,
         Number(payment?.amount ?? Math.abs(totals.totalAmount) ?? 0),
       );
+      const hasBankPayment =
+        paymentMode === "bank"
+          ? selectedPaymentAmount > 0 && payments[1]?.fund?.type === FundType.BANK
+          : paymentMode === "combined" &&
+            Number(payments[1]?.amount || 0) > 0 &&
+            payments[1]?.fund?.type === FundType.BANK;
       const paymentItems = payments
         .map((item, index) => ({
           ...(item || {}),
@@ -146,6 +155,9 @@ export const usePosSubmit = ({
         dispatch(removeOrderCache(activeOrder.id));
         dispatch(addNewCache({ type, order: emptyOrder(type) }));
         message.success(mode === "edit" ? "Đã cập nhật phiếu" : "Đã tạo phiếu");
+        if (mode !== "edit" && savedOrder && hasBankPayment) {
+          onTransferPaymentCreated?.(savedOrder);
+        }
         if (print && savedOrder && type === OrderType.SALE) printSales([savedOrder]);
       };
 
@@ -161,6 +173,7 @@ export const usePosSubmit = ({
       isReadOnlyReturn,
       message,
       orderStore,
+      onTransferPaymentCreated,
       payment,
       payments,
       paymentMode,

@@ -256,6 +256,7 @@ export type FilterKey =
   | "supplierGroupIds"
   | "shipperGroupIds"
   | "fundIds"
+  | "bankIds"
   | "orderIds"
   | "storeIds"
   | "roleIds"

@@ -15,6 +15,7 @@ import { SaleTable } from "./components/SaleTable";
 import { SaleDetailModal } from "./components/SaleDetailModal";
 import { SaleA4PrintDocument } from "./components/SaleA4Print";
 import { usePrintHtml } from "@/shared/hooks/usePrintHtml";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 import {
   CheckCircleIcon,
   EllipsisHorizontalIcon,
@@ -62,6 +63,7 @@ const SalePage: React.FC = () => {
     setOpenDetail: state.setOpenDetail,
     setRowData: state.setRowData,
   });
+  useNotificationDetailNavigation<Sale>(handlers.handleOpenDetail);
 
   const selectedRecords = useMemo(
     () => store.data.filter((record) => selectedRowKeys.includes(record.id)),

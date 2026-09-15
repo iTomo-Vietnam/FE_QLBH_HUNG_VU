@@ -203,6 +203,7 @@ const Notification: React.FC = () => {
     }
 
     onClick(item);
+    setShowNotifications(false);
   };
 
   const handleSeenAll = () => {

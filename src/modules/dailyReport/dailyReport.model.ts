@@ -54,6 +54,12 @@ export interface DailyTransferNoteSnapshot {
   note: string | null;
 }
 
+export interface DailyTransferNoteFundSummary {
+  fundId: string;
+  fundSnapshot: FundSnapshot | null;
+  amount: number;
+}
+
 export interface DailyReportSummary {
   orderCount: number;
   orderTotalAmount: number;
@@ -67,6 +73,8 @@ export interface DailyReportSummary {
   debtIncomeTotalAmount: number;
   transferNoteValidAmount: number;
   transferNoteInvalidAmount: number;
+  transferNotePersonalAmounts?: DailyTransferNoteFundSummary[];
+  transferNoteCompanyAmount?: number;
 }
 
 export enum DailyReportStatus {

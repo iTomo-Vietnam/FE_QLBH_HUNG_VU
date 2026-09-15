@@ -8,6 +8,7 @@ import { useFundAdjustmentStore } from "./fundAdjustment.store";
 import { useFundAdjustmentHandlers } from "./fundAdjustment.handlers";
 import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { FundAdjustmentAddUpdateModal, FundAdjustmentDetailModal, FundAdjustmentTable } from "./components";
+import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 export const FundAdjustmentPage: React.FC = () => {
   const {
@@ -24,6 +25,7 @@ export const FundAdjustmentPage: React.FC = () => {
     setOpenDetail,
     setRowData,
   });
+  useNotificationDetailNavigation<FundAdjustment>(handleDetail);
 
   return <div className="flex h-full w-full gap-3">
     <PanelFilter filterActive={isFilterActive} sortItems={sortItems} sortValue={{ sortBy, sortOrder }} onSortChange={pageAction.handleSortChange} rangerItems={rangerItems} rangerValue={ranger} onRangerChange={pageAction.handleRangerChange} filterUses={filterUses} onClearFilter={pageAction.resetFilter} />

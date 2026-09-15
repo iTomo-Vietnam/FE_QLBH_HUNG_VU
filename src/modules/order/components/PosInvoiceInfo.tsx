@@ -13,9 +13,14 @@ import { bank_bin_map } from "@/shared/constants/option/bank";
 import { DiscountType } from "@/shared/constants/enum";
 import { InputMoney, Label, OrderValueInput } from "@/shared/components";
 import { CachedOrder, PaymentMode, PosOrderType } from "@/shared/stores/orderCache.slice";
-import { formatMoney, getCashSuggestions, getCombinedCashSuggestions } from "@/shared/utils/number.util";
+import {
+  formatMoney,
+  getCashSuggestions,
+  getCombinedCashSuggestions,
+} from "@/shared/utils/number.util";
 import { QrPay } from "@/shared/utils/qrcode";
 import QRCode from "qrcode";
+import { AppSlider } from "@/shared/components/display/AppSlider";
 
 export interface PosTotals {
   grossAmount: number;
@@ -104,9 +109,10 @@ export const PosInvoiceInfo: React.FC<Props> = ({
   //   );
   // }, [paymentDue]);
   const cashAmountOptions = useMemo(
-    () => paymentMode === "combined"
-      ? getCombinedCashSuggestions(paymentDue)
-      : getCashSuggestions(paymentDue),
+    () =>
+      paymentMode === "combined"
+        ? getCombinedCashSuggestions(paymentDue)
+        : getCashSuggestions(paymentDue),
     [paymentDue, paymentMode],
   );
 
@@ -185,12 +191,15 @@ export const PosInvoiceInfo: React.FC<Props> = ({
             />
           </div>
         </div>
-        <ShipperAddSelect
-          value={activeOrder.shipperId || undefined}
-          defaultData={activeOrder.shipper as Partner | undefined}
-          query={{ type: PartnerType.SHIPPER }}
-          onChangeData={(shipper) => updateActive({ shipperId: shipper?.id || null, shipper })}
-        />
+
+        <AppSlider open={!!activeOrder.shippingFee}>
+          <ShipperAddSelect
+            value={activeOrder.shipperId || undefined}
+            defaultData={activeOrder.shipper as Partner | undefined}
+            query={{ type: PartnerType.SHIPPER }}
+            onChangeData={(shipper) => updateActive({ shipperId: shipper?.id || null, shipper })}
+          />
+        </AppSlider>
         <div className="mt-2 text-xs text-gray-500">
           {activeOrder.isFreeShipping !== false
             ? "Không cộng phí vào số tiền khách thanh toán."
@@ -273,6 +282,22 @@ export const PosInvoiceInfo: React.FC<Props> = ({
             </div>
           </div>
         )}
+        {(paymentMode === FundType.CASH || paymentMode === "combined") && (
+          <div className="min-h-[84px] rounded-md bg-[#f5f5f5] px-3 py-2">
+            <div className="flex flex-wrap gap-1.5">
+              {cashAmountOptions.map((amount) => (
+                <Button
+                  key={amount}
+                  className="rounded-full"
+                  type={Number(cashPayment.amount || 0) === amount ? "primary" : "default"}
+                  onClick={() => updatePayment({ amount }, 0)}
+                >
+                  {formatMoney(amount)}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
         {(paymentMode === FundType.BANK || paymentMode === "combined") && (
           <div className="flex items-center justify-between gap-3 py-2 text-sm">
             <span>{bankFund?.name || "Chuyển khoản"}</span>
@@ -297,22 +322,6 @@ export const PosInvoiceInfo: React.FC<Props> = ({
           />
         </div>
 
-        {(paymentMode === FundType.CASH || paymentMode === "combined") && (
-          <div className="min-h-[84px] rounded-md bg-[#f5f5f5] px-3 py-2">
-            <div className="flex flex-wrap gap-1.5">
-              {cashAmountOptions.map((amount) => (
-                <Button
-                  key={amount}
-                  className="rounded-full"
-                  type={Number(cashPayment.amount || 0) === amount ? "primary" : "default"}
-                  onClick={() => updatePayment({ amount }, 0)}
-                >
-                  {formatMoney(amount)}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
         {(paymentMode === FundType.BANK || paymentMode === "combined") && (
           <div className="mt-2 flex gap-3 rounded-md bg-[#f5f5f5] p-2">
             {qrImage && (
@@ -323,8 +332,9 @@ export const PosInvoiceInfo: React.FC<Props> = ({
               />
             )}
             <div className="flex flex-1 flex-col gap-3">
-              <Form.Item label="Tài khoản" className="mb-0">
+              <Form.Item noStyle>
                 <FundSelect
+                  placeholder="Chọn ngân hàng"
                   query={{ type: FundType.BANK }}
                   value={bankPayment.fundId || undefined}
                   defaultData={bankPayment.fund}
@@ -344,7 +354,12 @@ export const PosInvoiceInfo: React.FC<Props> = ({
                 <button
                   type="button"
                   className="w-fit font-semibold text-slate-500 transition-all ease-in-out hover:text-primary"
-                  onClick={() => updatePayment({ amount: Math.max(0, paymentDue - Number(cashPayment.amount || 0)) }, 1)}
+                  onClick={() =>
+                    updatePayment(
+                      { amount: Math.max(0, paymentDue - Number(cashPayment.amount || 0)) },
+                      1,
+                    )
+                  }
                 >
                   Thanh toán toàn bộ
                 </button>
@@ -407,6 +422,6 @@ export const PosInvoiceInfo: React.FC<Props> = ({
 const SummaryRow = ({ label, value }: { label: string; value: number }) => (
   <div className="flex items-center justify-between py-2 text-sm">
     <span>{label}</span>
-    <b>{formatMoney(value)}</b>
+    <b>{formatMoney(value) || "0"}</b>
   </div>
 );
