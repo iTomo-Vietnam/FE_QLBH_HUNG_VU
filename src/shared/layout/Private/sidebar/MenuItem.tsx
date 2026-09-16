@@ -54,7 +54,7 @@ export const SideBarMenuItems = (): MenuItem[] => {
     <CubeIcon />,
     [
       can("product") && item(privateRoutesName.product, "Danh sách hàng hóa"),
-      can("storeTransfer") && item(privateRoutesName.storeTransfer, "Chuyển kho"),
+      can("storeTransfer") && item(privateRoutesName.storeTransfer, "Chuyển hàng"),
       can("inventoryAdjustment") && item(privateRoutesName.inventoryAdjustment, "Kiểm kho"),
       can("internalExport") && item(privateRoutesName.internalExport, "Xuất nội bộ"),
     ].filter(Boolean) as MenuItem[],
@@ -110,7 +110,11 @@ export const SideBarMenuItems = (): MenuItem[] => {
           item(privateRoutesName.analysis.effectiveness, "Hiệu quả"),
         ]),
       can("dailyReport") &&
-        item(privateRoutesName.dailyReport, "Báo cáo hằng ngày", <Icon icon="solar:chart-2-outline" />),
+        item(
+          privateRoutesName.dailyReport,
+          "Báo cáo hằng ngày",
+          <Icon icon="solar:chart-2-outline" />,
+        ),
       can("reports") &&
         ({
           key: "reports-empty",

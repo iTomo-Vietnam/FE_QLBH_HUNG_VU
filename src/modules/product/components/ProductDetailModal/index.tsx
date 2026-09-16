@@ -61,9 +61,12 @@ export const ProductDetailModal: React.FC<DetailModalProps<Product>> = ({
       centered
       destroyOnClose
       width={1280}
+      className="fullscreen-modal"
     >
-      <div className="flex flex-col min-h-[70vh] gap-4">
-        {!hideTabs && (
+      <div className="flex flex-col h-full">
+        {hideTabs ? (
+          contentMap[tabItems[0].key]
+        ) : (
           <>
             <Tabs
               activeKey={activeTab}
@@ -71,10 +74,9 @@ export const ProductDetailModal: React.FC<DetailModalProps<Product>> = ({
               items={tabItems}
               tabBarStyle={{ marginBottom: 16 }}
             />
-            {contentMap[activeTab] || null}
+            <div>{contentMap[activeTab] || null}</div>
           </>
         )}
-        {hideTabs && contentMap[tabItems[0].key]}
       </div>
     </Modal>
   );

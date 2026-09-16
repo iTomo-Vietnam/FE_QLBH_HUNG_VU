@@ -6,15 +6,16 @@ import { usePageState } from "@/shared/hooks/usePageState";
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
 import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 import { SortOrder } from "@/shared/constants/enum";
-import { checkSelection } from "@/shared/utils/common.util";
 import {
   StoreTransfer,
   StoreTransferStatus,
   storeTransferStatusLabels,
+  filterUses,
+  rangerItems,
+  sortItems,
 } from "./storeTransfer.model";
 import { useStoreTransferStore } from "./storeTransfer.store";
 import { useStoreTransferHandlers } from "./storeTransfer.handlers";
-import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { StoreTransferDetailModal, StoreTransferModal, StoreTransferTable } from "./components";
 
 export const StoreTransferPage: React.FC = () => {
@@ -159,7 +160,7 @@ export const StoreTransferPage: React.FC = () => {
                 disabled={Boolean(store.create) && !currentStore}
                 tooltip={
                   !currentStore && store.create
-                    ? "Hãy chuyển sang chi nhánh để thêm phiếu chuyển kho"
+                    ? "Hãy chuyển sang chi nhánh để thêm phiếu chuyển hàng"
                     : undefined
                 }
               />
@@ -179,11 +180,6 @@ export const StoreTransferPage: React.FC = () => {
               onCancel={handleCancel}
               onCopy={store.create ? handleCopy : undefined}
               onViewDetail={handleOpenDetail}
-              onRow={(record: any) => ({
-                onClick: () => {
-                  if (!checkSelection()) handleOpenDetail(record);
-                },
-              })}
             />
           </Panel>
         </div>
@@ -208,6 +204,10 @@ export const StoreTransferPage: React.FC = () => {
         data={rowData}
         onClose={() => pageAction.handleClose()}
         onOpenUpdate={handleOpenEdit}
+        onDelete={handleDelete}
+        onExport={handleExport}
+        onImport={handleImport}
+        onCancel={handleCancel}
         onCopy={store.create ? handleCopy : undefined}
       />
     </div>

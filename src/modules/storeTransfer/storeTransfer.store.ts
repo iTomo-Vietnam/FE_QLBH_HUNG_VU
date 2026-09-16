@@ -48,7 +48,7 @@ export const useStoreTransferStore = createBaseStore<
           try {
             await postData(buildUrlWithId(`${apiEndpoint.storeTransfer.base}/:id/cancel`, id), {});
             queryClient.invalidateQueries({ queryKey: ["storeTransfers"] });
-            notify("success", "Hủy phiếu chuyển kho thành công");
+            notify("success", "Hủy phiếu chuyển hàng thành công");
             onSuccess?.();
           } catch (error) {
             onError(error);

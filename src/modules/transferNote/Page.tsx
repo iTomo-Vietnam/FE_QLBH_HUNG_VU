@@ -3,7 +3,7 @@ import { AddButton, Panel, PanelFilter, SearchInput } from "@/shared/components"
 import { usePageState } from "@/shared/hooks/usePageState";
 import { checkSelection } from "@/shared/utils/common.util";
 import { SortOrder } from "@/shared/constants/enum";
-import { TransferNote } from "./transferNote.model";
+import { filterUses, rangerItems, sortItems, TransferNote } from "./transferNote.model";
 import { useTransferNoteStore } from "./transferNote.store";
 import { useTransferNoteHandlers } from "./handlers";
 import {
@@ -11,7 +11,6 @@ import {
   TransferNoteDetailModal,
   TransferNoteTable,
 } from "./components";
-import { filterUses, rangerItems, sortItems } from "./filterItem";
 import { useNotificationDetailNavigation } from "@/shared/hooks/useNotificationDetailNavigation";
 
 export const TransferNotePage: React.FC = () => {

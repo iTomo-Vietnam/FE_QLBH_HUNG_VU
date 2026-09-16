@@ -487,8 +487,8 @@ export const StoreTransferModal: React.FC<StoreTransferModalProps> = ({
                 />
               </Form.Item>
               <Form.Item name="toStore" hidden />
-              <Form.Item name="reason" label={<Label title="Lý do chuyển kho" />}>
-                <Input.TextArea placeholder="Nhập lý do chuyển kho" />
+              <Form.Item name="reason" label={<Label title="Lý do chuyển hàng" />}>
+                <Input.TextArea placeholder="Nhập lý do chuyển hàng" />
               </Form.Item>
               <Form.Item name="note">
                 <Input.TextArea placeholder="Ghi chú" />
@@ -502,7 +502,7 @@ export const StoreTransferModal: React.FC<StoreTransferModalProps> = ({
                     disabled={loading || actionLoading}
                     onClick={() => {
                       modal.confirm({
-                        title: "Hủy phiếu chuyển kho",
+                        title: "Hủy phiếu chuyển hàng",
                         content: `Bạn có chắc muốn hủy phiếu ${editData?.code || ""}?`,
                         okText: "Hủy phiếu",
                         okButtonProps: { danger: true },

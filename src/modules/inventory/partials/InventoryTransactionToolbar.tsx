@@ -22,13 +22,13 @@ export const InventoryTransactionToolbar: React.FC<Props> = ({
   endAt,
   onDateRangerChange,
 }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
     {product && (
       <div className="w-full sm:w-96">
         <ProductCardLite item={product} />
       </div>
     )}
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 flex-1">
       <span className="text-xs text-primary">LỌC THEO</span>
       <RefTypeFilter refType={refType} setRefType={setRefType} />
     </div>
@@ -37,9 +37,7 @@ export const InventoryTransactionToolbar: React.FC<Props> = ({
       <DateRangeFilter
         startDate={startAt}
         endDate={endAt}
-        onRangeChange={(nextStartAt, nextEndAt) =>
-          onDateRangerChange?.(nextStartAt, nextEndAt)
-        }
+        onRangeChange={(nextStartAt, nextEndAt) => onDateRangerChange?.(nextStartAt, nextEndAt)}
       />
     </div>
   </div>

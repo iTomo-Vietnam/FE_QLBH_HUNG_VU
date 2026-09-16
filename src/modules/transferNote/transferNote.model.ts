@@ -1,7 +1,7 @@
 import { Entity } from "@/shared/base/entity";
 import { ApiRequestQuery } from "@/shared/interfaces/api";
 import { Fund, FundSnapshot } from "@/modules/fund/fund.model";
-import { FilterKey, SortItem } from "@/shared/interfaces";
+import { FilterKey, RangerItem, SortItem } from "@/shared/interfaces";
 
 export enum TransferNoteStatus {
   VALID = "valid",
@@ -37,4 +37,6 @@ export const sortItems: SortItem[] = [
   { label: "Thống kê", value: "amount", ascLabel: "Tăng dần", descLabel: "Giảm dần" },
 ];
 
-export const filterUses: FilterKey[] = ["bankIds", "creatorIds"];
+export const rangerItems: RangerItem[] = [{ label: "Số tiền", key: "amount" }];
+
+export const filterUses: FilterKey[] = ["fundIds", "creatorIds"];

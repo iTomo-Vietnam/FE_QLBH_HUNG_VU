@@ -2,6 +2,7 @@ import { Entity, Store, StoreSnapshot, User, UserSnapshot } from "@/shared/base/
 import { ApiRequestQuery } from "@/shared/interfaces/api";
 import { Attribute } from "../attribute/attribute.model";
 import { Product, ProductSnapshot } from "../product/product.model";
+import { FilterKey, RangerItem, SortItem } from "@/shared/interfaces/common";
 
 export interface StoreTransferQuery extends ApiRequestQuery {
   fromStoreId?: string;
@@ -93,3 +94,16 @@ export interface StoreTransfer extends Entity {
   reason: string | null;
   lines: StoreTransferLine[];
 }
+
+export const filterUses: FilterKey[] = ["productIds", "creatorIds", "exporterIds", "importerIds"];
+export const rangerItems: RangerItem[] = [
+  { label: "Ngày lập kế hoạch", key: "occurredAt", type: "date" },
+  { label: "Ngày xuất kho", key: "exportedAt", type: "date" },
+  { label: "Ngày nhập kho", key: "importedAt", type: "date" },
+];
+export const sortItems: SortItem[] = [
+  { label: "Ngày lập kế hoạch", value: "occurredAt", ascLabel: "Cũ nhất", descLabel: "Mới nhất" },
+  { label: "Số phiếu", value: "code", ascLabel: "A → Z", descLabel: "Z → A" },
+  { label: "Ngày xuất kho", value: "exportedAt", ascLabel: "Cũ nhất", descLabel: "Mới nhất" },
+  { label: "Ngày nhập kho", value: "importedAt", ascLabel: "Cũ nhất", descLabel: "Mới nhất" },
+];

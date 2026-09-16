@@ -15,13 +15,13 @@ export const RefTypeFilter: React.FC<Props> = ({ refType, setRefType }) => {
       <div
         key={value}
         onClick={() => setRefType?.(isSelected ? undefined : value)}
-        className={`relative cursor-pointer rounded-lg p-1.5 border-2 transition-all ${
+        className={`relative cursor-pointer rounded-lg px-1.5 border-2 transition-all ${
           isSelected
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30"
-            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-300 dark:hover:border-blue-700"
+            ? "border-primary bg-primary/10 dark:bg-blue-950/30"
+            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-primary/30"
         }`}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 h-7">
           {/* Icon */}
           <div
             className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 bg-green-100 dark:bg-green-950/30`}
@@ -48,5 +48,9 @@ export const RefTypeFilter: React.FC<Props> = ({ refType, setRefType }) => {
     );
   };
 
-  return <div className="flex gap-2 flex-wrap">{refTypes.map((value) => renderCard(value))}</div>;
+  return (
+    // <div className="flex overflow-x-auto min-w-0">
+    <div className="flex gap-2 flex-wrap">{refTypes.map((value) => renderCard(value))}</div>
+    // </div>
+  );
 };

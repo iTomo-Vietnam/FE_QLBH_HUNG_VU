@@ -1,4 +1,5 @@
 import { App } from "antd";
+import { useRef } from "react";
 import { StoreTransfer } from "./storeTransfer.model";
 import {
   canCancelStoreTransfer,
@@ -18,10 +19,7 @@ interface StoreTransferHandlersInput {
   create?: StoreTransferMutation;
   update?: StoreTransferMutation;
   remove?: (id: string) => void;
-  getById?: (
-    id: string,
-    opts?: { onSuccess?: (data: StoreTransfer | null) => void },
-  ) => void;
+  getById?: (id: string, opts?: { onSuccess?: (data: StoreTransfer | null) => void }) => void;
   exportTransfer?: (id: string) => Promise<void>;
   importTransfer?: (id: string) => Promise<void>;
   cancelTransfer?: (id: string) => Promise<void>;
@@ -57,6 +55,17 @@ export function useStoreTransferHandlers({
   resetFilter,
 }: StoreTransferHandlersInput) {
   const { modal } = App.useApp();
+  const exportingIdsRef = useRef(new Set<string>());
+
+  // The create/update callback and a fast double click can otherwise submit
+  // the same transition more than once before the list is refreshed.
+  const exportOnce = (id: string): Promise<void> => {
+    if (!exportTransfer || exportingIdsRef.current.has(id)) return Promise.resolve();
+    exportingIdsRef.current.add(id);
+    return exportTransfer(id).finally(() => {
+      exportingIdsRef.current.delete(id);
+    });
+  };
 
   const withDetails = (record: StoreTransfer, callback: (data: StoreTransfer) => void) => {
     if (getById) {
@@ -100,7 +109,7 @@ export function useStoreTransferHandlers({
           content: "Xác nhận đã xuất hàng khỏi kho chuyển?",
           okText: "Xác nhận",
           cancelText: "Đóng",
-          onOk: () => exportTransfer(record.id),
+          onOk: () => exportOnce(record.id),
         });
       }
     : undefined;
@@ -122,7 +131,7 @@ export function useStoreTransferHandlers({
     ? (record: StoreTransfer) => {
         if (!canCancelStoreTransfer(record, currentStoreId)) return;
         modal.confirm({
-          title: "Hủy phiếu chuyển kho",
+          title: "Hủy phiếu chuyển hàng",
           content: "Phiếu sẽ tạo giao dịch đảo kho theo các mốc đã thực hiện. Tiếp tục?",
           okText: "Hủy phiếu",
           okButtonProps: { danger: true },
@@ -168,7 +177,7 @@ export function useStoreTransferHandlers({
     ? (data: Partial<StoreTransfer>) => {
         create(data, {
           onSuccess: (created) => {
-            if (created?.id && exportTransfer) void exportTransfer(created.id);
+            if (created?.id) void exportOnce(created.id).catch(() => undefined);
           },
         });
       }
@@ -178,7 +187,7 @@ export function useStoreTransferHandlers({
     ? (data: Partial<StoreTransfer>) => {
         update(data, {
           onSuccess: (updated) => {
-            if (updated?.id && exportTransfer) void exportTransfer(updated.id);
+            if (updated?.id) void exportOnce(updated.id).catch(() => undefined);
           },
         });
       }

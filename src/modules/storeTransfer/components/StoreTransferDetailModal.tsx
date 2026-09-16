@@ -1,16 +1,29 @@
 import React from "react";
-import { Button, Descriptions, Modal, Table, Tag } from "antd";
-import { CopyOutlined } from "@ant-design/icons";
+import { Button, Descriptions, Modal, Space, Table, Tag } from "antd";
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  CopyOutlined,
+  DeleteOutlined,
+  ExportOutlined,
+  EditOutlined,
+  ImportOutlined,
+} from "@ant-design/icons";
 import { DetailModalProps } from "@/shared/interfaces/common";
 import { formatDateTimeDDMMYYYY } from "@/shared/utils/date.util";
 import { formatQuantity } from "@/shared/utils/number.util";
 import { useGlobalData } from "@/shared/hooks/useGlobalData";
 import {
   canEditStoreTransfer,
+  canCancelStoreTransfer,
+  canExportStoreTransfer,
+  canImportStoreTransfer,
   StoreTransfer,
   StoreTransferStatus,
   storeTransferStatusLabels,
+  StoreTransferLine,
 } from "../storeTransfer.model";
+import { resolveByPath } from "@/shared/utils";
 
 const statusColors: Record<StoreTransferStatus, string> = {
   [StoreTransferStatus.PLANNED]: "gold",
@@ -24,6 +37,10 @@ const actorName = (snapshot: StoreTransfer["exporterSnapshot"]): string =>
 
 interface Props extends DetailModalProps<StoreTransfer> {
   onCopy?: (record: StoreTransfer) => void;
+  onDelete?: (record: StoreTransfer) => void;
+  onExport?: (record: StoreTransfer) => void;
+  onImport?: (record: StoreTransfer) => void;
+  onCancel?: (record: StoreTransfer) => void;
 }
 
 export const StoreTransferDetailModal: React.FC<Props> = ({
@@ -32,10 +49,34 @@ export const StoreTransferDetailModal: React.FC<Props> = ({
   onClose,
   onOpenUpdate,
   onCopy,
+  onDelete,
+  onExport,
+  onImport,
+  onCancel,
 }) => {
   const { currentStore } = useGlobalData();
   if (!data) return null;
   const status = data.status || StoreTransferStatus.PLANNED;
+  const canEdit =
+    !!onOpenUpdate &&
+    Boolean(data._actions?.update?.can) &&
+    canEditStoreTransfer(data, currentStore?.id);
+  const canDelete =
+    !!onDelete &&
+    Boolean(data._actions?.delete?.can) &&
+    canEditStoreTransfer(data, currentStore?.id);
+  const canExport =
+    !!onExport &&
+    Boolean(data._actions?.export?.can) &&
+    canExportStoreTransfer(data, currentStore?.id);
+  const canImport =
+    !!onImport &&
+    Boolean(data._actions?.import?.can) &&
+    canImportStoreTransfer(data, currentStore?.id);
+  const canCancel =
+    !!onCancel &&
+    Boolean(data._actions?.cancel?.can) &&
+    canCancelStoreTransfer(data, currentStore?.id);
 
   return (
     <Modal
@@ -44,7 +85,7 @@ export const StoreTransferDetailModal: React.FC<Props> = ({
       destroyOnClose
       width={900}
       footer={null}
-      title={`Chi tiết phiếu chuyển kho ${data.code || ""}`}
+      title={`Chi tiết phiếu chuyển hàng ${data.code || ""}`}
       onCancel={onClose}
     >
       <Descriptions bordered size="small" column={2}>
@@ -82,7 +123,7 @@ export const StoreTransferDetailModal: React.FC<Props> = ({
           </Descriptions.Item>
         )}
       </Descriptions>
-      <Table
+      <Table<StoreTransferLine>
         rowKey="id"
         className="mt-4"
         size="small"
@@ -90,40 +131,67 @@ export const StoreTransferDetailModal: React.FC<Props> = ({
         dataSource={data.lines || []}
         columns={[
           {
-            title: "Hàng hóa",
-            render: (_: unknown, line: any) =>
-              line.product?.name || line.productSnapshot?.name || "--",
+            title: "Mã hàng",
+            key: "productCode",
+            render: (_, line) => resolveByPath(line, ["product", "code"]),
           },
           {
-            title: "Mã hàng",
-            render: (_: unknown, line: any) =>
-              line.product?.code || line.productSnapshot?.code || "--",
+            title: "Tên hàng",
+            key: "productName",
+            render: (_, line) => resolveByPath(line, ["product", "name"]),
           },
           {
             title: "ĐVT",
-            render: (_: unknown, line: any) => line.unit?.name || line.unitSnapshot?.name || "--",
+            key: "unitName",
+            render: (_, line) => resolveByPath(line, ["unit", "name"]),
           },
           {
             title: "Số lượng",
+            dataIndex: "quantity",
+            key: "quantity",
             align: "right" as const,
-            render: (_: unknown, line: any) => formatQuantity(line.quantity),
+            render: (value) => formatQuantity(value),
           },
         ]}
       />
-      <div className="mt-4 flex justify-end gap-2">
-        <Button onClick={onClose}>Đóng</Button>
-        {onCopy && (
-          <Button icon={<CopyOutlined />} onClick={() => onCopy(data)}>
-            Sao chép
-          </Button>
-        )}
-        {onOpenUpdate &&
-          data._actions?.update?.can &&
-          canEditStoreTransfer(data, currentStore?.id) && (
-            <Button type="primary" onClick={() => onOpenUpdate(data)}>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <Space wrap>
+          {canCancel && (
+            <Button danger icon={<CloseCircleOutlined />} onClick={() => onCancel?.(data)}>
+              Hủy
+            </Button>
+          )}
+          {canDelete && (
+            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete?.(data)}>
+              Xóa
+            </Button>
+          )}
+          {onCopy && (
+            <Button icon={<CopyOutlined />} onClick={() => onCopy(data)}>
+              Sao chép
+            </Button>
+          )}
+        </Space>
+        <Space wrap>
+          {canExport && (
+            <Button type="primary" icon={<ExportOutlined />} onClick={() => onExport?.(data)}>
+              Xuất kho
+            </Button>
+          )}
+          {canImport && (
+            <Button type="primary" icon={<ImportOutlined />} onClick={() => onImport?.(data)}>
+              Nhập kho
+            </Button>
+          )}
+          {canEdit && (
+            <Button type="primary" icon={<EditOutlined />} onClick={() => onOpenUpdate?.(data)}>
               Chỉnh sửa
             </Button>
           )}
+          <Button icon={<CheckCircleOutlined />} onClick={onClose}>
+            Đóng
+          </Button>
+        </Space>
       </div>
     </Modal>
   );

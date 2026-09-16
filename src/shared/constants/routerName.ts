@@ -169,7 +169,7 @@ export const routeTitleMap: RouteTitleMap = {
   },
   storeTransfer: {
     path: privateRoutesName.storeTransfer,
-    title: "Chuyển kho",
+    title: "Chuyển hàng",
     subtitle: "Theo dõi hàng hóa chuyển giữa các kho",
   },
   inventoryAdjustment: {

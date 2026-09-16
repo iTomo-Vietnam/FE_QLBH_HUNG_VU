@@ -83,31 +83,33 @@ export const StoreTransferTable: React.FC<ObjectTableProps> = (props) => {
         title: "Xuất kho",
         key: "export",
         width: 180,
-        render: (_value: unknown, record: StoreTransfer) => (
-          <div className="flex flex-col">
-            <span className="leading-4 font-semibold">
-              {resolveByPath(record, ["exporter", "name"]) || record.exporterSnapshot?.name || "--"}
-            </span>
-            <span className="text-xs text-gray-500">
-              {record.exportedAt ? formatDateTimeDDMMYYYY(record.exportedAt) : "--"}
-            </span>
-          </div>
-        ),
+        render: (_value: unknown, record: StoreTransfer) =>
+          (record.exporter || record.exporterSnapshot || record.exportedAt) && (
+            <div className="flex flex-col">
+              <span className="leading-4 font-semibold">
+                {resolveByPath(record, ["exporter", "name"]) || "--"}
+              </span>
+              <span className="text-xs text-gray-500">
+                {record.exportedAt ? formatDateTimeDDMMYYYY(record.exportedAt) : "--"}
+              </span>
+            </div>
+          ),
       },
       {
         title: "Nhập kho",
         key: "importer",
         width: 180,
-        render: (_value: unknown, record: StoreTransfer) => (
-          <div className="flex flex-col">
-            <span className="leading-4 font-semibold">
-              {resolveByPath(record, ["importer", "name"]) || record.importerSnapshot?.name || "--"}
-            </span>
-            <span className="text-xs text-gray-500">
-              {record.importedAt ? formatDateTimeDDMMYYYY(record.importedAt) : "--"}
-            </span>
-          </div>
-        ),
+        render: (_value: unknown, record: StoreTransfer) =>
+          (record.importer || record.importerSnapshot || record.importedAt) && (
+            <div className="flex flex-col">
+              <span className="leading-4 font-semibold">
+                {resolveByPath(record, ["importer", "name"]) || "--"}
+              </span>
+              <span className="text-xs text-gray-500">
+                {record.importedAt ? formatDateTimeDDMMYYYY(record.importedAt) : "--"}
+              </span>
+            </div>
+          ),
       },
       {
         title: "Lý do",
